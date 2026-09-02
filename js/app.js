@@ -1,6 +1,6 @@
 /* ============================================================
- * 艾瑟兰 · 页面交互
- * 标签页 / 地图控件 / 城市卡片 / 种族图鉴
+ * 艾瑟兰 · 页面交互 v2
+ * 标签页 / 十四势力图例 / 城市卡片 / 种族图鉴 / 地理志
  * ============================================================ */
 
 (function () {
@@ -8,6 +8,13 @@
 
   /* ---------------- 启动 3D 世界（最先执行，供后续 UI 绑定） ---------------- */
   World.init();
+
+  function factionById(id) {
+    for (var i = 0; i < FACTIONS.length; i++) {
+      if (FACTIONS[i].id === id) return FACTIONS[i];
+    }
+    return FACTIONS[0];
+  }
 
   /* ---------------- 标签页 ---------------- */
 
@@ -34,18 +41,18 @@
     })(tabs[ti]);
   }
 
-  /* ---------------- 图例（种族分布） ---------------- */
+  /* ---------------- 图例（十四势力） ---------------- */
 
   var legendEl = document.getElementById('legend-list');
   if (legendEl) {
     var html = '';
-    for (var k in RACES) {
-      var r = RACES[k];
+    for (var k = 0; k < FACTIONS.length; k++) {
+      var f = FACTIONS[k];
       html +=
-        '<button class="legend-item" data-race="' + r.id + '">' +
-        '<span class="legend-dot" style="background:' + r.color + ';box-shadow:0 0 8px ' + r.color + '"></span>' +
-        '<span class="legend-name">' + r.name + '</span>' +
-        '<span class="legend-nation">' + r.nation + '</span>' +
+        '<button class="legend-item" data-faction="' + f.id + '">' +
+        '<span class="legend-dot" style="background:' + f.color + ';box-shadow:0 0 8px ' + f.color + '"></span>' +
+        '<span class="legend-name">' + f.name + '</span>' +
+        '<span class="legend-nation">' + f.kind + '</span>' +
         '</button>';
     }
     legendEl.innerHTML = html;
@@ -53,27 +60,24 @@
     for (var li = 0; li < items.length; li++) {
       (function (btn) {
         btn.addEventListener('click', function () {
-          var region = null;
-          for (var i = 0; i < REGIONS.length; i++) {
-            if (REGIONS[i].id === btn.getAttribute('data-race')) { region = REGIONS[i]; break; }
-          }
-          if (region) World.flyToRegion(region);
+          World.flyToFaction(factionById(btn.getAttribute('data-faction')));
         });
       })(items[li]);
     }
   }
 
-  /* ---------------- 地点速览 ---------------- */
+  /* ---------------- 地点速览（十四城） ---------------- */
 
   var placeEl = document.getElementById('place-list');
   if (placeEl) {
     var ph = '';
     for (var ci = 0; ci < CITIES.length; ci++) {
       var c = CITIES[ci];
-      var race = c.race === 'rift' ? { name: '圣所', color: '#7fe8ff' } : RACES[c.race];
+      var f = factionById(c.faction);
+      var col = f.color;
       ph +=
         '<button class="place-item" data-city="' + c.id + '">' +
-        '<span class="place-dot" style="background:' + race.color + '"></span>' +
+        '<span class="place-dot" style="background:' + col + '"></span>' +
         '<span class="place-name">' + c.name + '</span>' +
         '</button>';
     }
@@ -82,11 +86,9 @@
     for (var pi = 0; pi < pitems.length; pi++) {
       (function (btn) {
         btn.addEventListener('click', function () {
-          var city = null;
           for (var i = 0; i < CITIES.length; i++) {
-            if (CITIES[i].id === btn.getAttribute('data-city')) { city = CITIES[i]; break; }
+            if (CITIES[i].id === btn.getAttribute('data-city')) { World.flyToCity(CITIES[i]); break; }
           }
-          if (city) World.flyToCity(city);
         });
       })(pitems[pi]);
     }
@@ -100,10 +102,10 @@
 
   World.onHover(function (city) {
     if (city && tooltip) {
-      var race = city.race === 'rift' ? { name: '星辉裂隙', color: '#7fe8ff' } : RACES[city.race];
+      var f = factionById(city.faction);
       tipName.textContent = city.name;
-      tipSub.textContent = race.name + ' · ' + city.title;
-      tipSub.style.color = race.color;
+      tipSub.textContent = f.name + ' · ' + city.title;
+      tipSub.style.color = f.color;
       tooltip.classList.add('show');
     } else if (tooltip) {
       tooltip.classList.remove('show');
@@ -113,14 +115,15 @@
   var card = document.getElementById('city-card');
   function openCard(city) {
     if (!city || !card) return;
-    var race = city.race === 'rift' ? { name: '星辉裂隙', color: '#7fe8ff', id: 'rift' } : RACES[city.race];
-    document.getElementById('cc-race-chip').textContent = race.name;
-    document.getElementById('cc-race-chip').style.background = race.color;
+    var f = factionById(city.faction);
+    var rc = RACES[f.race] || RACES.human;
+    document.getElementById('cc-race-chip').textContent = f.name;
+    document.getElementById('cc-race-chip').style.background = f.color;
     document.getElementById('cc-name').textContent = city.name;
     document.getElementById('cc-title').textContent = city.title;
     document.getElementById('cc-pop').textContent = city.pop;
     document.getElementById('cc-ruler').textContent = city.ruler;
-    document.getElementById('cc-lore').textContent = city.lore;
+    document.getElementById('cc-lore').textContent = city.lore + '（' + f.name + ' · ' + f.kind + '，' + rc.name + '）';
     card.classList.add('open');
   }
   function closeCard() { if (card) card.classList.remove('open'); }
@@ -131,7 +134,6 @@
   var cardClose = document.getElementById('cc-close');
   if (cardClose) cardClose.addEventListener('click', closeCard);
 
-  // 卡片跟随鼠标位置（tooltip）
   var mapPane = document.getElementById('tab-map');
   if (mapPane && tooltip) {
     mapPane.addEventListener('pointermove', function (e) {
@@ -249,6 +251,21 @@
     chronEl.innerHTML = ch;
   }
 
+  // 地理志（十景）
+  var geoEl = document.getElementById('geo-grid');
+  if (geoEl) {
+    var ghtml = '';
+    for (var gi = 0; gi < GEOGRAPHY.length; gi++) {
+      var geo = GEOGRAPHY[gi];
+      ghtml +=
+        '<div class="geo-card' + (geo.color === '#7fe8ff' ? ' geo-rift' : '') + '" style="--gc:' + geo.color + '">' +
+        '<h4>' + geo.name + ' <small>' + geo.who + '</small></h4>' +
+        '<p>' + geo.desc + '</p>' +
+        '</div>';
+    }
+    geoEl.innerHTML = ghtml;
+  }
+
   // 魔法学派
   var schoolEl = document.getElementById('school-grid');
   if (schoolEl) {
@@ -286,8 +303,8 @@
   var glossEl = document.getElementById('glossary-table');
   if (glossEl) {
     var gh2 = '<table><thead><tr><th>词条</th><th>释义</th></tr></thead><tbody>';
-    for (var gi = 0; gi < GLOSSARY.length; gi++) {
-      gh2 += '<tr><td class="g-term">' + GLOSSARY[gi][0] + '</td><td>' + GLOSSARY[gi][1] + '</td></tr>';
+    for (var gi2 = 0; gi2 < GLOSSARY.length; gi2++) {
+      gh2 += '<tr><td class="g-term">' + GLOSSARY[gi2][0] + '</td><td>' + GLOSSARY[gi2][1] + '</td></tr>';
     }
     gh2 += '</tbody></table>';
     glossEl.innerHTML = gh2;

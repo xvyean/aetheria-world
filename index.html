@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>艾瑟兰 · 星辉大陆 — 3D 奇幻世界</title>
-<meta name="description" content="艾瑟兰（Aetheria）——一个剑与魔法的三维奇幻世界。程序化生成的星辉大陆，五族一影的种族分布，完整的世界观设定。">
+<meta name="description" content="艾瑟兰（Aetheria）——一个剑与魔法的三维奇幻世界。程序化生成的星辉大陆：大陆与群岛、三河两湖、十四势力十四城，完整的世界观设定。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e8b84a' d='M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.4-6.3 4.4L8 13.8 2 9.2h7.6z'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -33,10 +33,10 @@
       <div id="map-hud">
         <div class="hud-panel" id="side-panel">
           <div class="hud-head">
-            <h3>种族分布</h3>
+            <h3>十四势力</h3>
             <span class="hud-year" id="map-year"></span>
           </div>
-          <div class="hud-sub">点击图例，飞赴该族领地</div>
+          <div class="hud-sub">点击势力，飞赴其疆域</div>
           <div id="legend-list"></div>
 
           <div class="hud-sub hud-sub2">地标速览</div>
@@ -100,9 +100,9 @@
           </blockquote>
           <div class="lore-chips">
             <span>高奇幻 · 剑与魔法</span>
-            <span>五族一影</span>
+            <span>十四势力 · 十四城</span>
             <span id="lore-year">星辉历 412 年</span>
-            <span>七大地理单元</span>
+            <span>三河两湖 · 雾沼</span>
           </div>
         </div>
 
@@ -132,36 +132,7 @@
             <span class="sec-no"><i>叁</i></span>
             <h2>地理志</h2>
           </div>
-          <div class="geo-grid">
-            <div class="geo-card" style="--gc:#e8b84a">
-              <h4>中央平原 <small>人类 · 白冠王国</small></h4>
-              <p>大陆的心脏，沃土千里。白冠城踞于平原中央的七丘之上，世界的商路在此交汇。平原东缘的星辉河每年春天会泛起短暂的银光——那是裂隙潮汐的回响。</p>
-            </div>
-            <div class="geo-card" style="--gc:#3fae6a">
-              <h4>翡翠林海 <small>精灵 · 银叶王国</small></h4>
-              <p>万顷古木，云雾终年不散。林中没有路，精灵用歌声标记方向。千岁梧桐立于林海之心，树冠即是王庭。三百年间，林外的人只见过它的叶子，没见过它的根。</p>
-            </div>
-            <div class="geo-card" style="--gc:#d08a3e">
-              <h4>铁砧山脉 <small>矮人 · 铁砧山脉领</small></h4>
-              <p>横贯大陆北部的巨龙脊背。山中有七千条矿脉，脉脉相连通向熔心城。雪山之上终年飘着铜色烟霞——矮人说，那是山脉的心跳。</p>
-            </div>
-            <div class="geo-card" style="--gc:#c94f3d">
-              <h4>风暴荒原 <small>兽人 · 风暴荒原</small></h4>
-              <p>西风自荒原尽头永不停歇。黑牙堡立于唯一背风的巨岩之上，雷牙图腾面向风暴——兽人说，图腾要看着最难的东西，才算见过世面。</p>
-            </div>
-            <div class="geo-card" style="--gc:#a8c84a">
-              <h4>绿苔谷 <small>半身人 · 绿苔谷</small></h4>
-              <p>大陆最温和的坡地，麦浪一层一层涌向南方。金麦镇的车队从这里出发，走过平原、林海与山脉，把金穗金币带到世界的每一个角落。</p>
-            </div>
-            <div class="geo-card" style="--gc:#8a4fd0">
-              <h4>暮影领 <small>禁域 · 寂灭之塔</small></h4>
-              <p>极北的暗土，雾比雪更冷。这里的树没有影子，河流倒流。寂灭之塔立于雾中，塔顶的光只在北征者的日记里出现过三次——三次，三个方向，不一致。</p>
-            </div>
-            <div class="geo-card geo-rift" style="--gc:#7fe8ff">
-              <h4>星辉裂隙 <small>世界之心</small></h4>
-              <p>最大星陨碎片的陨落之地。水晶昼夜生长，光柱直入云霄，浮空岛悬于其上。星辉潮汐在此生成、再返回世界——每一次潮汐，都让裂隙的纹路扩大一分。</p>
-            </div>
-          </div>
+          <div class="geo-grid" id="geo-grid"></div>
         </section>
 
         <!-- 星辉魔法 -->
@@ -206,7 +177,7 @@
         <div class="races-hero frame">
           <div class="lore-orn">────── ✦ ──────</div>
           <h1>种族图鉴</h1>
-          <p>五族在《白冠之誓》下共享大陆，一影在极北的雾中守望。以下条目摘自《白冠圣典 · 异族卷》、银叶王国档案馆与黑牙堡的战鼓记录。</p>
+          <p>《白冠之誓》下，大陆为十四势力共有：人类四王一岛，精灵两林，矮人两山，兽人两团，半身人一谷一盟——一影在极北的雾中守望。以下条目摘自《白冠圣典 · 异族卷》、银叶王国档案馆、灰港商会账册与黑牙堡的战鼓记录。</p>
         </div>
         <div id="race-grid" class="race-grid"></div>
         <footer class="lore-foot">
@@ -221,6 +192,7 @@
 <script src="vendor/three.min.js"></script>
 <script src="vendor/OrbitControls.js"></script>
 <script src="js/noise.js"></script>
+<script src="js/terrain.js"></script>
 <script src="js/data.js"></script>
 <script src="js/world.js"></script>
 <script src="js/app.js"></script>
