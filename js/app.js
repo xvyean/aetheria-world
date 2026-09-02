@@ -66,31 +66,53 @@
     }
   }
 
-  /* ---------------- 地点速览（十四城） ---------------- */
+  /* ---------------- 地点速览（十四都 + 星槎 / 城 · 镇 · 村） ---------------- */
 
+  var capEl = document.getElementById('place-caps');
   var placeEl = document.getElementById('place-list');
-  if (placeEl) {
-    var ph = '';
+  if (capEl && placeEl) {
+    var ch = '';
     for (var ci = 0; ci < CITIES.length; ci++) {
       var c = CITIES[ci];
+      if ((c.tier || 'capital') !== 'capital') continue;
       var f = factionById(c.faction);
-      var col = f.color;
-      ph +=
-        '<button class="place-item" data-city="' + c.id + '">' +
-        '<span class="place-dot" style="background:' + col + '"></span>' +
+      ch +=
+        '<button class="place-item place-cap" data-city="' + c.id + '">' +
+        '<span class="place-dot" style="background:' + f.color + ';box-shadow:0 0 7px ' + f.color + '"></span>' +
         '<span class="place-name">' + c.name + '</span>' +
         '</button>';
     }
+    ch +=
+      '<button class="place-item place-cap place-academy" data-city="academy">' +
+      '<span class="place-dot" style="background:#f2e8c8;box-shadow:0 0 9px #ffe9a8"></span>' +
+      '<span class="place-name">✦ 星槎学院</span>' +
+      '</button>';
+    capEl.innerHTML = ch;
+
+    var ph = '';
+    for (var ci2 = 0; ci2 < CITIES.length; ci2++) {
+      var c2 = CITIES[ci2];
+      if ((c2.tier || 'capital') === 'capital') continue;
+      var f2 = factionById(c2.faction);
+      ph +=
+        '<button class="place-item place-' + c2.tier + '" data-city="' + c2.id + '">' +
+        '<span class="place-dot" style="background:' + f2.color + '"></span>' +
+        '<span class="place-name">' + c2.name + '</span>' +
+        '</button>';
+    }
     placeEl.innerHTML = ph;
-    var pitems = placeEl.querySelectorAll('.place-item');
-    for (var pi = 0; pi < pitems.length; pi++) {
+
+    var all = document.querySelectorAll('.place-item');
+    for (var pi = 0; pi < all.length; pi++) {
       (function (btn) {
         btn.addEventListener('click', function () {
-          for (var i = 0; i < CITIES.length; i++) {
-            if (CITIES[i].id === btn.getAttribute('data-city')) { World.flyToCity(CITIES[i]); break; }
+          var id = btn.getAttribute('data-city');
+          if (id === 'academy') { World.flyToAcademy(); return; }
+          for (var i2 = 0; i2 < CITIES.length; i2++) {
+            if (CITIES[i2].id === id) { World.flyToCity(CITIES[i2]); break; }
           }
         });
-      })(pitems[pi]);
+      })(all[pi]);
     }
   }
 
@@ -102,10 +124,16 @@
 
   World.onHover(function (city) {
     if (city && tooltip) {
-      var f = factionById(city.faction);
-      tipName.textContent = city.name;
-      tipSub.textContent = f.name + ' · ' + city.title;
-      tipSub.style.color = f.color;
+      if (city.id === 'academy') {
+        tipName.textContent = city.name;
+        tipSub.textContent = '空岛学府 · ' + city.title;
+        tipSub.style.color = '#f2e8c8';
+      } else {
+        var f = factionById(city.faction);
+        tipName.textContent = city.name;
+        tipSub.textContent = f.name + ' · ' + city.title;
+        tipSub.style.color = f.color;
+      }
       tooltip.classList.add('show');
     } else if (tooltip) {
       tooltip.classList.remove('show');
@@ -115,14 +143,27 @@
   var card = document.getElementById('city-card');
   function openCard(city) {
     if (!city || !card) return;
+    if (city.id === 'academy') {
+      document.getElementById('cc-race-chip').textContent = '星槎';
+      document.getElementById('cc-race-chip').style.background = '#f2e8c8';
+      document.getElementById('cc-name').textContent = '星槎学院';
+      document.getElementById('cc-title').textContent = ACADEMY.subtitle;
+      document.getElementById('cc-pop').textContent = ACADEMY.location;
+      document.getElementById('cc-ruler').textContent = ACADEMY.head;
+      document.getElementById('cc-lore').textContent =
+        ACADEMY.motto + ' 创立：' + ACADEMY.founded + '。' + ACADEMY.admission + '。点击下方「星槎学院」标签，看四院与分选礼的完整记录。';
+      card.classList.add('open');
+      return;
+    }
     var f = factionById(city.faction);
-    var rc = RACES[f.race] || RACES.human;
-    document.getElementById('cc-race-chip').textContent = f.name;
+    var rc = RACES[f.race] || { name: '星辉' };
+    var tierName = city.tier === 'city' ? '大城' : (city.tier === 'town' ? '镇' : (city.tier === 'village' ? '村' : '首都'));
+    document.getElementById('cc-race-chip').textContent = f.name + ' · ' + tierName;
     document.getElementById('cc-race-chip').style.background = f.color;
     document.getElementById('cc-name').textContent = city.name;
     document.getElementById('cc-title').textContent = city.title;
     document.getElementById('cc-pop').textContent = city.pop;
-    document.getElementById('cc-ruler').textContent = city.ruler;
+    document.getElementById('cc-ruler').textContent = city.ruler || f.ruler;
     document.getElementById('cc-lore').textContent = city.lore + '（' + f.name + ' · ' + f.kind + '，' + rc.name + '）';
     card.classList.add('open');
   }
@@ -230,6 +271,72 @@
     grid.innerHTML = gh;
   }
 
+  /* ---------------- 星槎学院：动态注入 ---------------- */
+
+  var A = ACADEMY;
+  document.getElementById('academy-motto').textContent = '“' + A.motto + '”';
+  document.getElementById('academy-founded').textContent = A.founded;
+  document.getElementById('academy-lifted').textContent = A.lifted;
+  document.getElementById('academy-head').textContent = A.head;
+  document.getElementById('academy-admit').textContent = A.admission;
+
+  var histEl = document.getElementById('academy-history');
+  if (histEl) {
+    var hh = '';
+    for (var hi = 0; hi < A.history.length; hi++) {
+      hh += '<p' + (hi === 0 ? ' class="dropcap"' : '') + '>' + A.history[hi] + '</p>';
+    }
+    histEl.innerHTML = hh;
+  }
+
+  var houseEl = document.getElementById('house-grid');
+  if (houseEl) {
+    var imgMap = { dawn: 'house-dawn.png', speak: 'house-speak.png', forge: 'house-forge.png', tide: 'house-tide.png' };
+    var hh2 = '';
+    for (var hj = 0; hj < A.houses.length; hj++) {
+      var hs = A.houses[hj];
+      hh2 +=
+        '<article class="house-card" style="--hc:' + hs.color + '">' +
+        '<div class="house-emblem"><img src="img/' + (imgMap[hs.id] || '') + '" alt="' + hs.sigil + '徽记"></div>' +
+        '<div class="house-head">' +
+        '<h3>' + hs.name + '</h3>' +
+        '<p class="house-motto">“' + hs.motto + '”</p>' +
+        '</div>' +
+        '<div class="house-tags">' +
+        '<span>学派 · ' + hs.element + '</span>' +
+        '<span>院德 · ' + hs.virtue + '</span>' +
+        '<span>徽记 · ' + hs.sigil + '</span>' +
+        '</div>' +
+        '<p class="house-desc">' + hs.desc + '</p>' +
+        '<div class="house-foot">' +
+        '<div><b>开院</b>' + hs.founded + '</div>' +
+        '<div><b>名士</b>' + hs.alumni + '</div>' +
+        '</div>' +
+        '</article>';
+    }
+    houseEl.innerHTML = hh2;
+  }
+
+  var sortEl = document.getElementById('academy-sorting');
+  if (sortEl) sortEl.textContent = A.sorting.desc;
+
+  var ritEl = document.getElementById('academy-rituals');
+  var bldEl = document.getElementById('academy-buildings');
+  if (ritEl) {
+    var rh = '';
+    for (var rti = 0; rti < A.rituals.length; rti++) {
+      rh += '<div class="academy-item"><h5>' + A.rituals[rti].name + '</h5><p>' + A.rituals[rti].desc + '</p></div>';
+    }
+    ritEl.innerHTML = rh;
+  }
+  if (bldEl) {
+    var bh = '';
+    for (var bli = 0; bli < A.buildings.length; bli++) {
+      bh += '<div class="academy-item"><h5>' + A.buildings[bli].name + '</h5><p>' + A.buildings[bli].desc + '</p></div>';
+    }
+    bldEl.innerHTML = bh;
+  }
+
   /* ---------------- 世界观：动态注入 ---------------- */
 
   // 纪元年表
@@ -288,7 +395,7 @@
     var ah = '';
     for (var ai = 0; ai < ARTIFACTS.length; ai++) {
       var a = ARTIFACTS[ai];
-      var rc = RACES[a.race];
+      var rc = RACES[a.race] || { color: '#7fd8e8', nation: '星辉圣地' };
       ah +=
         '<div class="artifact-row">' +
         '<span class="artifact-name"><i style="background:' + rc.color + '"></i>' + a.name + '</span>' +
@@ -312,7 +419,7 @@
 
   // 世界观头部
   document.getElementById('lore-name').textContent = WORLD.name;
-  document.getElementById('lore-en').textContent = WORLD.en + ' · THE STARFALL CONTINENT';
+  document.getElementById('lore-en').textContent = WORLD.en + ' · THREE CONTINENTS, ONE FLOATING ISLE';
   document.getElementById('lore-epigraph').textContent = WORLD.epigraph;
   document.getElementById('lore-epigraph-source').textContent = WORLD.epigraphSource;
   document.getElementById('lore-year').textContent = WORLD.year;

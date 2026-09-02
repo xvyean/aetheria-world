@@ -52,8 +52,8 @@ var World = (function () {
   var currentPreset = 'dawn';
   var autoRotateOn = false;
 
-  var START_POS = new THREE.Vector3(400, 300, 580);
-  var START_TGT = new THREE.Vector3(30, 8, 20);
+  var START_POS = new THREE.Vector3(200, 720, 1150);
+  var START_TGT = new THREE.Vector3(60, 0, 120);
 
   /* ---------------- 工具 ---------------- */
 
@@ -191,7 +191,7 @@ var World = (function () {
         '}'
       ].join('\n')
     });
-    var sky = new THREE.Mesh(new THREE.SphereGeometry(3600, 32, 24), skyMat);
+    var sky = new THREE.Mesh(new THREE.SphereGeometry(5200, 32, 24), skyMat);
     sky.renderOrder = -10;
     scene.add(sky);
   }
@@ -204,7 +204,7 @@ var World = (function () {
       var u = Noise.rand() * 2 - 1;
       var th = Noise.rand() * Math.PI * 2;
       var r = Math.sqrt(1 - u * u);
-      var rad = 3400;
+      var rad = 4900;
       pos[i * 3] = Math.cos(th) * r * rad;
       pos[i * 3 + 1] = Math.max(u, 0.02) * rad;
       pos[i * 3 + 2] = Math.sin(th) * r * rad;
@@ -254,13 +254,14 @@ var World = (function () {
         '  float w2 = sin((vWorld.x + vWorld.z) * 0.08 - uTime * 0.9);',
         '  float w3 = sin(vWorld.z * 0.14 + uTime * 0.7);',
         '  float w4 = sin((vWorld.x - vWorld.z) * 0.22 + uTime * 1.7);',
-        '  float w = (w1 + w2 + w3) * 0.16 + w4 * 0.06 + 0.42;',
+        '  float w5 = sin(vWorld.x * 0.031 + uTime * 0.30) * sin(vWorld.z * 0.027 - uTime * 0.22);',
+        '  float w = (w1 + w2 + w3) * 0.12 + w4 * 0.05 + w5 * 0.24 + 0.42;',
         '  vec3 col = mix(uDeep, uShallow, clamp(w, 0.0, 1.0));',
         '  float glint = smoothstep(0.86, 1.0, w) * 0.38;',
         '  col += uSunColor * glint * (1.0 - uNight * 0.5);',
         '  col = mix(col, col * 0.35, uNight);',
         '  // 地形边界以外渐变为不透明深海（隐藏地形边界）',
-        '  float beyond = max(smoothstep(520.0, 950.0, abs(vWorld.x)), smoothstep(520.0, 950.0, abs(vWorld.z)));',
+        '  float beyond = max(smoothstep(680.0, 1150.0, abs(vWorld.x)), smoothstep(680.0, 1150.0, abs(vWorld.z)));',
         '  col = mix(col, uDeep, beyond * 0.85);',
         '  float alpha = mix(0.88, 1.0, beyond);',
         '  float fogFactor = smoothstep(uFogNear, uFogFar, distance(cameraPosition, vWorld));',
@@ -269,7 +270,7 @@ var World = (function () {
         '}'
       ].join('\n')
     });
-    var geo = new THREE.PlaneGeometry(SIZE * 8, SIZE * 8, 96, 96);
+    var geo = new THREE.PlaneGeometry(SIZE * 8, SIZE * 8, 120, 120);
     geo.rotateX(-Math.PI / 2);
     water = new THREE.Mesh(geo, waterMat);
     water.position.y = 0;
@@ -335,7 +336,9 @@ var World = (function () {
   }
 
   function buildTerrain() {
-    var geo = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG);
+    // 网格略低于采样分辨率（地形由 481² 采样网格双线性插值，海岸线依然平滑）
+    var MS = Math.min(SEG, 340);
+    var geo = new THREE.PlaneGeometry(SIZE, SIZE, MS, MS);
     geo.rotateX(-Math.PI / 2);
     var pos = geo.attributes.position;
     var colors = new Float32Array(pos.count * 3);
@@ -366,7 +369,7 @@ var World = (function () {
     var sites = [];
     for (var fi = 0; fi < FACTIONS.length; fi++) {
       var F = FACTIONS[fi];
-      var n = F.enclave ? 1 : (Noise.rand() < 0.55 ? 1 : 2);
+      var n = F.enclave ? 1 : (Noise.rand() < 0.4 ? 2 : 3);
       for (var k = 0; k < n; k++) {
         var placed = false;
         for (var attempt = 0; attempt < 40 && !placed; attempt++) {
@@ -374,7 +377,7 @@ var World = (function () {
           var lo = 55, hi = Math.max(lo + 20, F.r * 0.6);
           var rr = lo + Noise.rand() * (hi - lo);
           var x = F.cx + Math.cos(a) * rr, z = F.cz + Math.sin(a) * rr;
-          if (Math.abs(x) > 470 || Math.abs(z) > 470) continue;
+          if (Math.abs(x) > 770 || Math.abs(z) > 770) continue;
           var h = sampleH(x, z);
           if (h < 1.6 || h > 11) continue;
           if (slopeAt(x, z) > 0.4) continue;
@@ -448,8 +451,8 @@ var World = (function () {
   function buildTrees() {
     Noise.srand(20260902);
     var ever = [], leaf = [];
-    var tries = 42000;
-    for (var i = 0; i < tries && (ever.length + leaf.length) < 4600; i++) {
+    var tries = 60000;
+    for (var i = 0; i < tries && (ever.length + leaf.length) < 7000; i++) {
       var x = (Noise.rand() * 2 - 1) * SIZE * 0.49;
       var z = (Noise.rand() * 2 - 1) * SIZE * 0.49;
       var h = sampleH(x, z);
@@ -511,71 +514,127 @@ var World = (function () {
 
   /* ---------------- 城市建筑 ---------------- */
 
+  /* 每族一套屋顶形制（统一的民族风格）：
+   * 人族坡顶 / 精灵尖顶 / 矮平顶石 / 兽人圆帐 / 半身人圆顶 / 暮影尖塔 / 圣地棱塔 */
+  var ROOF_GEOS = {};
+  function roofGeoFor(race) {
+    if (ROOF_GEOS[race]) return ROOF_GEOS[race];
+    var g;
+    switch (race) {
+      case 'elf':
+        g = new THREE.ConeGeometry(0.95, 1.15, 6);
+        g.translate(0, 0.575, 0);
+        break;
+      case 'dwarf':
+        g = new THREE.BoxGeometry(1.3, 0.55, 1.3);
+        g.translate(0, 0.275, 0);
+        break;
+      case 'orc':
+        g = new THREE.ConeGeometry(1.05, 0.72, 6);
+        g.translate(0, 0.36, 0);
+        break;
+      case 'halfling':
+        g = new THREE.SphereGeometry(0.95, 10, 7, 0, Math.PI * 2, 0, Math.PI / 2);
+        break;
+      case 'necro':
+        g = new THREE.ConeGeometry(0.72, 1.4, 4);
+        g.translate(0, 0.7, 0);
+        break;
+      case 'rift':
+        g = new THREE.ConeGeometry(0.8, 1.2, 3);
+        g.translate(0, 0.6, 0);
+        break;
+      default: // human
+        g = new THREE.ConeGeometry(0.85, 0.9, 4);
+        g.translate(0, 0.45, 0);
+        g.rotateY(Math.PI / 4);
+    }
+    ROOF_GEOS[race] = g;
+    return g;
+  }
+
+  // 分层级：capital 首都 / city 大城 / town 镇 / village 村
   function buildCities() {
     var wallGeo = new THREE.BoxGeometry(1, 1, 1);
     wallGeo.translate(0, 0.5, 0);
-    var roofGeo = new THREE.ConeGeometry(0.85, 0.9, 4);
-    roofGeo.translate(0, 0.45, 0);
-    roofGeo.rotateY(Math.PI / 4);
 
-    var walls = [], roofs = [], wallCols = [], roofCols = [];
+    var TIER = {
+      capital: { R: 22, count: 52, wMin: 2.0, wMax: 4.2, hMin: 1.8, hMax: 5.4, gap: 3.6 },
+      city: { R: 13, count: 22, wMin: 1.6, wMax: 3.0, hMin: 1.4, hMax: 3.6, gap: 3.2 },
+      town: { R: 8, count: 9, wMin: 1.2, wMax: 2.2, hMin: 1.1, hMax: 2.4, gap: 2.8 },
+      village: { R: 5, count: 4, wMin: 0.9, wMax: 1.6, hMin: 0.9, hMax: 1.8, gap: 2.4 }
+    };
+
+    var walls = [];
+    var roofBuckets = {}; // race -> { mats: [], cols: [] }
     Noise.srand(99123);
     for (var ci = 0; ci < CITIES.length; ci++) {
       var c = CITIES[ci];
       var F = factionOf(c);
-      var R = c.id === 'whitecrown' ? 26 : (c.id === 'silence' ? 12 : (c.id === 'sanctum' ? 13 : 18));
-      var count = c.id === 'whitecrown' ? 88 : (c.id === 'silence' || c.id === 'sanctum' ? 30 : 44);
+      var T = TIER[c.tier] || TIER.village;
+      if (c.id === 'whitecrown') { T.R = 30; T.count = 92; }
+      if (c.id === 'silence') { T.R = 12; T.count = 30; }
+      if (c.id === 'sanctum') { T.R = 13; T.count = 30; }
       var placed = 0, guard = 0;
       var maxH = c.id === 'moltenheart' ? 30 : 20;
-      while (placed < count && guard++ < count * 40) {
+      var minGap = T.gap;
+      while (placed < T.count && guard++ < T.count * 40) {
         var a = Noise.rand() * Math.PI * 2;
-        var rr = Math.sqrt(Noise.rand()) * R;
+        var rr = Math.sqrt(Noise.rand()) * T.R;
         var x = c._wx + Math.cos(a) * rr;
         var z = c._wz + Math.sin(a) * rr;
         var h = sampleH(x, z);
-        if (h < 1.5 || h > maxH) continue;
-        var ok = Math.hypot(x - c._wx, z - c._wz) > 6;
+        if (h < 1.4 || h > maxH) continue;
+        var ok = Math.hypot(x - c._wx, z - c._wz) > 5;
         if (ok) {
           for (var p = 0; p < walls.length; p++) {
-            if (Math.abs(walls[p].x - x) < 3.4 && Math.abs(walls[p].z - z) < 3.4) { ok = false; break; }
+            if (Math.abs(walls[p].x - x) < minGap && Math.abs(walls[p].z - z) < minGap) { ok = false; break; }
           }
         }
         if (!ok) continue;
-        var w = 2.0 + Noise.rand() * 2.2;
-        var d = 2.0 + Noise.rand() * 2.2;
-        var bh = 1.8 + Noise.rand() * 3.2 + (1 - rr / R) * 2.6;
+        var w = T.wMin + Noise.rand() * (T.wMax - T.wMin);
+        var d = T.wMin + Noise.rand() * (T.wMax - T.wMin);
+        var bh = T.hMin + Noise.rand() * (T.hMax - T.hMin) + (1 - rr / T.R) * 2.4;
         var rot = (Noise.rand() < 0.5 ? 0 : Math.PI / 2) + (Noise.rand() - 0.5) * 0.2;
         var dummy = new THREE.Object3D();
         dummy.position.set(x, h - 0.1, z);
         dummy.rotation.set(0, rot, 0);
         dummy.scale.set(w, bh, d);
         dummy.updateMatrix();
-        walls.push({ m: dummy.matrix.clone(), x: x, z: z });
+        walls.push({ m: dummy.matrix.clone(), x: x, z: z, c: new THREE.Color(F.build.wall).multiplyScalar(0.88 + Noise.rand() * 0.2) });
         dummy.position.set(x, h - 0.1 + bh, z);
         dummy.scale.set(w * 1.28, 0.7 + Noise.rand() * 0.5, d * 1.28);
         dummy.updateMatrix();
-        roofs.push({ m: dummy.matrix.clone() });
-        wallCols.push(new THREE.Color(F.build.wall).multiplyScalar(0.88 + Noise.rand() * 0.2));
-        roofCols.push(new THREE.Color(F.build.roof).multiplyScalar(0.72 + Noise.rand() * 0.38));
+        if (!roofBuckets[F.race]) roofBuckets[F.race] = { mats: [], cols: [] };
+        roofBuckets[F.race].mats.push(dummy.matrix.clone());
+        roofBuckets[F.race].cols.push(new THREE.Color(F.build.roof).multiplyScalar(0.72 + Noise.rand() * 0.38));
         placed++;
       }
     }
     var wallMesh = new THREE.InstancedMesh(
       wallGeo, new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0.05 }), walls.length
     );
-    var roofMesh = new THREE.InstancedMesh(
-      roofGeo, new THREE.MeshStandardMaterial({ roughness: 0.7, metalness: 0.15 }), roofs.length
-    );
     for (var i = 0; i < walls.length; i++) {
       wallMesh.setMatrixAt(i, walls[i].m);
-      wallMesh.setColorAt(i, wallCols[i]);
-      roofMesh.setMatrixAt(i, roofs[i].m);
-      roofMesh.setColorAt(i, roofCols[i]);
+      wallMesh.setColorAt(i, walls[i].c);
     }
-    wallMesh.castShadow = roofMesh.castShadow = true;
+    wallMesh.castShadow = true;
     if (wallMesh.instanceColor) wallMesh.instanceColor.needsUpdate = true;
-    if (roofMesh.instanceColor) roofMesh.instanceColor.needsUpdate = true;
-    scene.add(wallMesh, roofMesh);
+    scene.add(wallMesh);
+    for (var race in roofBuckets) {
+      var rb = roofBuckets[race];
+      if (!rb.mats.length) continue;
+      var roofMesh = new THREE.InstancedMesh(
+        roofGeoFor(race), new THREE.MeshStandardMaterial({ roughness: 0.7, metalness: 0.15 }), rb.mats.length
+      );
+      for (var ri = 0; ri < rb.mats.length; ri++) {
+        roofMesh.setMatrixAt(ri, rb.mats[ri]);
+        roofMesh.setColorAt(ri, rb.cols[ri]);
+      }
+      roofMesh.castShadow = true;
+      if (roofMesh.instanceColor) roofMesh.instanceColor.needsUpdate = true;
+      scene.add(roofMesh);
+    }
   }
 
   function factionOf(city) {
@@ -781,8 +840,26 @@ var World = (function () {
         }
       }
 
-      // 旗帜与信标（圣所除外）
-      if (c.id !== 'sanctum') {
+      var tier = c.tier || 'capital';
+      // 大城：本族配色的小塔 + 微弱信标
+      if (tier === 'city') {
+        addMesh(g, new THREE.CylinderGeometry(1.0, 1.5, 7.5, 8), stdMat(F.build.wall), 6, 3.75, 5);
+        addMesh(g, new THREE.ConeGeometry(1.6, 3.0, 8), stdMat(F.build.roof, { metalness: 0.3 }), 6, 9.0, 5);
+        var bCity = addGlow(g, rc, 9, 0.35, 6, 11, 5);
+        beacons.push({ sprite: bCity, baseScale: 9, baseOpacity: 0.35, color: rc });
+      } else if (tier === 'town' || tier === 'village') {
+        // 镇 / 村：一面本族色的小旗
+        addMesh(g, new THREE.CylinderGeometry(0.14, 0.18, 7, 6), stdMat(0x8a8a92), 4, 3.5, 3);
+        var tFlag = new THREE.Mesh(
+          new THREE.PlaneGeometry(tier === 'town' ? 2.8 : 2.0, tier === 'town' ? 1.7 : 1.3),
+          stdMat(rc, { side: THREE.DoubleSide, emissive: rc, emissiveIntensity: 0.3 })
+        );
+        tFlag.position.set(5.4, 6.2, 3);
+        tFlag.castShadow = true;
+        g.add(tFlag);
+      }
+      // 首都旗帜与信标（圣所除外）
+      if (tier === 'capital' && c.id !== 'sanctum') {
         addMesh(g, new THREE.CylinderGeometry(0.18, 0.22, 11, 6), stdMat(0x8a8a92), 8.5, 5.5, 4);
         var flag = new THREE.Mesh(
           new THREE.PlaneGeometry(4.4, 2.6),
@@ -931,30 +1008,6 @@ var World = (function () {
     ring2.position.y = 26;
     g.add(ring2);
 
-    // 浮空岛
-    island = new THREE.Group();
-    var rockMat = stdMat(0x6f6660, { roughness: 1 });
-    addMesh(island, new THREE.CylinderGeometry(9, 7.5, 2.5, 10), rockMat, 0, 0, 0);
-    var bottom = addMesh(island, new THREE.ConeGeometry(7.5, 11, 8), rockMat, 0, -6.7, 0);
-    bottom.rotation.x = Math.PI;
-    var soilMat = stdMat(0x4a6a35, { roughness: 1 });
-    var soil = new THREE.Mesh(new THREE.CylinderGeometry(8.2, 8.2, 0.6, 10), soilMat);
-    soil.position.y = 1.2;
-    island.add(soil);
-    for (var tt = 0; tt < 4; tt++) {
-      var ta = tt * 1.7 + 0.5;
-      var tr = 3.5 + (tt % 2) * 2.5;
-      addMesh(island, new THREE.CylinderGeometry(0.3, 0.5, 2.2, 5), stdMat(0x6b4a30), Math.cos(ta) * tr, 2.4, Math.sin(ta) * tr);
-      addMesh(island, new THREE.ConeGeometry(1.6, 3.6, 7), stdMat(0x245c34), Math.cos(ta) * tr, 5.4, Math.sin(ta) * tr);
-    }
-    var icr = new THREE.Mesh(new THREE.OctahedronGeometry(1.2), cryMat);
-    icr.position.set(0, 3, 0);
-    icr.scale.set(1, 1.8, 1);
-    island.add(icr);
-    island.add(addGlow(island, 0x7fe8ff, 14, 0.5, 0, -2, 0));
-    island.position.set(0, 46, 0);
-    g.add(island);
-
     // 上升粒子
     var pn = 320;
     var pgeo = new THREE.BufferGeometry();
@@ -991,7 +1044,110 @@ var World = (function () {
     riftParticles.geo.attributes.position.needsUpdate = true;
   }
 
-  /* ---------------- 星辉流（裂隙 → 各城） ---------------- */
+  /* ---------------- 星槎学院（裂隙上空 300 丈的空岛） ---------------- */
+
+  var academy = null;
+  var academyBaseY = 0;
+  var academyCrystal = null;
+
+  function buildAcademy() {
+    var p = { x: RIFT_POS[0], z: RIFT_POS[1] };
+    var y0 = sampleH(p.x, p.z);
+    academyBaseY = y0 + 104;
+    var g = new THREE.Group();
+    g.position.set(p.x, academyBaseY, p.z);
+
+    var rockMat = stdMat(0x6f6660, { roughness: 1 });
+    addMesh(g, new THREE.CylinderGeometry(30, 24, 4.5, 18), rockMat, 0, 0, 0);
+    var bottom = addMesh(g, new THREE.ConeGeometry(24, 30, 14), rockMat, 0, -17, 0);
+    bottom.rotation.x = Math.PI;
+    // 散落的浮岩
+    Noise.srand(88221);
+    for (var fr = 0; fr < 8; fr++) {
+      var fa = Noise.rand() * Math.PI * 2;
+      var fr2 = 35 + Noise.rand() * 20;
+      var f = addMesh(g, new THREE.DodecahedronGeometry(1.4 + Noise.rand() * 2.4, 0), rockMat,
+        Math.cos(fa) * fr2, -2 - Noise.rand() * 16, Math.sin(fa) * fr2);
+      f.rotation.set(Noise.rand() * 3, Noise.rand() * 3, Noise.rand() * 3);
+    }
+    // 草皮
+    var soil = new THREE.Mesh(new THREE.CylinderGeometry(29.4, 29.4, 0.7, 18), stdMat(0x4a6a35, { roughness: 1 }));
+    soil.position.y = 2.6;
+    g.add(soil);
+
+    // 星陨塔（岛心主塔）
+    var towerMat = stdMat(0xe8e4d8, { roughness: 0.55 });
+    addMesh(g, new THREE.CylinderGeometry(3.4, 5.2, 30, 12), towerMat, 0, 17.5, 0);
+    addMesh(g, new THREE.CylinderGeometry(2.4, 3.4, 8, 12), towerMat, 0, 36, 0);
+    addMesh(g, new THREE.ConeGeometry(3.3, 9, 12), stdMat(0xd9b45b, { metalness: 0.4, roughness: 0.4 }), 0, 43, 0);
+    academyCrystal = new THREE.Mesh(
+      new THREE.OctahedronGeometry(2.6),
+      stdMat(0xbfefff, { emissive: 0x54d4f4, emissiveIntensity: 2, roughness: 0.2 })
+    );
+    academyCrystal.position.set(0, 50.5, 0);
+    academyCrystal.scale.set(1, 1.7, 1);
+    academyCrystal.castShadow = true;
+    g.add(academyCrystal);
+    addGlow(g, 0x8fe8ff, 24, 0.5, 0, 50.5, 0);
+
+    // 四院尖塔（四角，各用本院色彩）
+    var houses = [
+      { c: 0xe8b45b, hex: '#e8b45b', a: Math.PI / 4 },       // 晨辉
+      { c: 0x2f8a4a, hex: '#2f8a4a', a: Math.PI * 3 / 4 },    // 星语
+      { c: 0xc97a4a, hex: '#c97a4a', a: Math.PI * 5 / 4 },    // 锤音
+      { c: 0x4a9dc9, hex: '#4a9dc9', a: Math.PI * 7 / 4 }     // 海心
+    ];
+    for (var hi = 0; hi < houses.length; hi++) {
+      var hv = houses[hi];
+      var hx = Math.cos(hv.a) * 18, hz = Math.sin(hv.a) * 18;
+      addMesh(g, new THREE.CylinderGeometry(1.9, 2.6, 15, 8), stdMat(0xe4e0d4, { roughness: 0.6 }), hx, 10, hz);
+      addMesh(g, new THREE.ConeGeometry(2.7, 7, 8), stdMat(hv.c, { metalness: 0.35, roughness: 0.5 }), hx, 20, hz);
+      var hb = addGlow(g, hv.c, 10, 0.42, hx, 23, hz);
+      beacons.push({ sprite: hb, baseScale: 10, baseOpacity: 0.42, color: hv.hex });
+      // 回廊（岛心 → 院塔）
+      var len = 18 - 3;
+      var walk = addMesh(g, new THREE.BoxGeometry(len, 0.7, 2.4), stdMat(0xcfc8b8, { roughness: 0.8 }),
+        Math.cos(hv.a) * 9.5, 3.4, Math.sin(hv.a) * 9.5);
+      walk.rotation.y = -hv.a + Math.PI / 2;
+    }
+    // 宿舍环（岛缘小屋）
+    for (var dr = 0; dr < 12; dr++) {
+      var da = dr / 12 * Math.PI * 2 + 0.26;
+      if (Math.abs(Math.sin(da)) > 0.92 && Math.abs(Math.cos(da)) > 0.92) continue;
+      var dx = Math.cos(da) * 25, dz = Math.sin(da) * 25;
+      var dh = addMesh(g, new THREE.SphereGeometry(1.9, 8, 6), stdMat(0xe4ddcc), dx, 3.2, dz);
+      dh.scale.set(1.15, 0.8, 1.15);
+      var dr2 = addMesh(g, new THREE.ConeGeometry(2.2, 1.8, 8), stdMat(houses[dr % 4].c, { roughness: 0.6 }), dx, 5.4, dz);
+      dr2.rotation.y = da;
+    }
+    // 星穗馆（圆顶图书馆）
+    addMesh(g, new THREE.SphereGeometry(4.6, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+      stdMat(0xd9b45b, { metalness: 0.45, roughness: 0.35 }), -11, 2.9, -13);
+    addMesh(g, new THREE.CylinderGeometry(4.8, 5.1, 1.6, 14), stdMat(0xe8e4d8), -11, 3.2, -13);
+    // 浮池（悬在岛缘、水不落的水池）
+    var pool = new THREE.Mesh(
+      new THREE.CircleGeometry(5.2, 24),
+      new THREE.MeshStandardMaterial({ color: C(0x3a9dc0), roughness: 0.15, metalness: 0.1, emissive: C(0x1a4a66), emissiveIntensity: 0.5 })
+    );
+    pool.rotation.x = -Math.PI / 2;
+    pool.position.set(13, 4.2, -11);
+    g.add(pool);
+    // 岛上小树
+    for (var at = 0; at < 7; at++) {
+      var aa = Noise.rand() * Math.PI * 2;
+      var ar = 14 + Noise.rand() * 10;
+      var ax = Math.cos(aa) * ar, az = Math.sin(aa) * ar;
+      if (Math.hypot(ax, az) < 8) continue;
+      addMesh(g, new THREE.CylinderGeometry(0.24, 0.4, 1.8, 5), stdMat(0x6b4a30), ax, 3.8, az);
+      addMesh(g, new THREE.ConeGeometry(1.3, 3.0, 7), stdMat(0x245c34), ax, 6.4, az);
+    }
+    addGlow(g, 0x8fe8ff, 30, 0.3, 0, -14, 0);
+
+    scene.add(g);
+    academy = g;
+  }
+
+  /* ---------------- 星辉流（裂隙 → 各首都） ---------------- */
 
   function buildStreams() {
     var p0 = { x: RIFT_POS[0], z: RIFT_POS[1] };
@@ -999,6 +1155,7 @@ var World = (function () {
     Noise.srand(666);
     for (var i = 0; i < CITIES.length; i++) {
       var c = CITIES[i];
+      if ((c.tier || 'capital') !== 'capital') continue;
       if (c.id === 'sanctum') continue;
       var end = new THREE.Vector3(c._wx, c._y + 5, c._wz);
       var mid = start.clone().lerp(end, 0.5);
@@ -1051,7 +1208,7 @@ var World = (function () {
       zenith: 0x5f74c9, horizon: 0xf0b183, sunDir: [1.0, 0.32, 0.22], sunColor: 0xffd9a0,
       sunIntensity: 0.85, sunPos: [760, 350, 240],
       hemiSky: 0xc9b8d8, hemiGround: 0x6a5a4a, hemiIntensity: 0.55,
-      fog: 0xd9b491, fogNear: 700, fogFar: 2800,
+      fog: 0xd9b491, fogNear: 1100, fogFar: 4400,
       stars: 0.18, night: 0.15,
       waterDeep: 0x0d3d5c, waterShallow: 0x3a9dc0, waterSun: 0xffe3b8
     },
@@ -1059,7 +1216,7 @@ var World = (function () {
       zenith: 0x4a8fd9, horizon: 0xcfe8f5, sunDir: [0.35, 1.0, 0.25], sunColor: 0xfff5e0,
       sunIntensity: 1.0, sunPos: [380, 950, 280],
       hemiSky: 0xdceeff, hemiGround: 0x8a7a60, hemiIntensity: 0.64,
-      fog: 0xcfe3ee, fogNear: 900, fogFar: 3400,
+      fog: 0xcfe3ee, fogNear: 1400, fogFar: 5200,
       stars: 0, night: 0,
       waterDeep: 0x0d4a6e, waterShallow: 0x35a8d8, waterSun: 0xffffff
     },
@@ -1067,7 +1224,7 @@ var World = (function () {
       zenith: 0x070b22, horizon: 0x1b2a52, sunDir: [-0.55, 0.75, -0.35], sunColor: 0x9fb4ff,
       sunIntensity: 0.5, sunPos: [-560, 760, -340],
       hemiSky: 0x33436e, hemiGround: 0x181828, hemiIntensity: 0.5,
-      fog: 0x111832, fogNear: 600, fogFar: 2600,
+      fog: 0x111832, fogNear: 900, fogFar: 4000,
       stars: 1, night: 1,
       waterDeep: 0x06182e, waterShallow: 0x14405e, waterSun: 0xbcd0ff
     }
@@ -1163,7 +1320,7 @@ var World = (function () {
   /* ---------------- 交互 ---------------- */
 
   function updateHover() {
-    var best = null, bestD = 30;
+    var best = null, bestD = 38;
     for (var i = 0; i < cities3D.length; i++) {
       var c = cities3D[i];
       tmpV.set(c.wx, c.y + 8, c.wz).project(camera);
@@ -1193,17 +1350,17 @@ var World = (function () {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xd9b491, 700, 2800);
+    scene.fog = new THREE.Fog(0xd9b491, 1100, 4400);
 
-    camera = new THREE.PerspectiveCamera(50, 1, 0.5, 9000);
+    camera = new THREE.PerspectiveCamera(50, 1, 0.5, 12000);
     camera.position.copy(START_POS);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.copy(START_TGT);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.minDistance = 80;
-    controls.maxDistance = 1400;
+    controls.minDistance = 60;
+    controls.maxDistance = 2400;
     controls.maxPolarAngle = 1.48;
     controls.minPolarAngle = 0.08;
     controls.autoRotateSpeed = 0.4;
@@ -1216,12 +1373,12 @@ var World = (function () {
     sun.position.set(760, 350, 240);
     sun.castShadow = true;
     sun.shadow.mapSize.set(4096, 4096);
-    sun.shadow.camera.left = -700;
-    sun.shadow.camera.right = 700;
-    sun.shadow.camera.top = 700;
-    sun.shadow.camera.bottom = -700;
+    sun.shadow.camera.left = -850;
+    sun.shadow.camera.right = 850;
+    sun.shadow.camera.top = 850;
+    sun.shadow.camera.bottom = -850;
     sun.shadow.camera.near = 100;
-    sun.shadow.camera.far = 2800;
+    sun.shadow.camera.far = 3600;
     sun.shadow.bias = -0.0004;
     scene.add(sun);
     scene.add(sun.target);
@@ -1273,12 +1430,22 @@ var World = (function () {
     buildLandmarks();
     buildNecroShards();
     buildRift();
+    buildAcademy();
     buildStreams();
 
     for (var j = 0; j < CITIES.length; j++) {
       var cd = CITIES[j];
       cities3D.push({ data: cd, wx: cd._wx, wz: cd._wz, y: cd._y });
     }
+    // 星槎空岛也是可点击目标
+    cities3D.push({
+      data: {
+        id: 'academy', name: '星槎学院', tier: 'academy', faction: null,
+        title: '裂隙上空 · 万族最高学府', pop: '学生 400 · 师长 41',
+        lore: ACADEMY.motto
+      },
+      wx: RIFT_POS[0], wz: RIFT_POS[1], y: academyBaseY + 12
+    });
 
     atmo = makeState(PRESETS.dawn);
     applyAtmosphere();
@@ -1357,9 +1524,9 @@ var World = (function () {
       var ps = 1 + Math.sin(t * 1.4) * 0.06;
       discMesh.scale.set(ps, ps, 1);
     }
-    if (island) {
-      island.position.y = 46 + Math.sin(t * 0.5) * 1.6;
-      island.rotation.y = t * 0.05;
+    if (academy) {
+      academy.position.y = academyBaseY + Math.sin(t * 0.4) * 1.5;
+      if (academyCrystal) academyCrystal.rotation.y = t * 0.6;
     }
 
     renderer.render(scene, camera);
@@ -1398,13 +1565,22 @@ var World = (function () {
     getPreset: function () { return currentPreset; },
     flyToCity: function (data) {
       var c = data;
-      var d = c.id === 'whitecrown' ? 240 : (c.id === 'silence' || c.id === 'sanctum' ? 160 : 200);
+      var d;
+      if (c.id === 'academy') d = 190;
+      else if ((c.tier || 'capital') === 'capital') d = c.id === 'whitecrown' ? 260 : 200;
+      else if (c.tier === 'city') d = 150;
+      else if (c.tier === 'town') d = 115;
+      else d = 90;
       flyTo(new THREE.Vector3(c._wx, c._y + 4, c._wz), d);
     },
     flyToFaction: function (f) {
       var y = Math.max(sampleH(f.cx, f.cz), 6);
-      var dist = Math.max(240, Math.min(460, f.r * 2.8));
+      var dist = Math.max(260, Math.min(640, f.r * 2.6));
       flyTo(new THREE.Vector3(f.cx, y + 6, f.cz), dist);
+    },
+    flyToAcademy: function () {
+      if (!academy) return;
+      flyTo(new THREE.Vector3(RIFT_POS[0], academyBaseY + 14, RIFT_POS[1]), 200);
     },
     resetView: function () {
       fly = {

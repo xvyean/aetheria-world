@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>艾瑟兰 · 星辉大陆 — 3D 奇幻世界</title>
-<meta name="description" content="艾瑟兰（Aetheria）——一个剑与魔法的三维奇幻世界。程序化生成的星辉大陆：大陆与群岛、三河两湖、十四势力十四城，完整的世界观设定。">
+<title>艾瑟兰 · 三块大陆 — 3D 剑与魔法世界</title>
+<meta name="description" content="艾瑟兰（Aetheria）——一个剑与魔法的三维奇幻世界：三块大陆、碎浪群岛、四河四湖、十四势力四十二城，以及悬在星辉裂隙上的空岛学府星槎学院。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e8b84a' d='M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.4-6.3 4.4L8 13.8 2 9.2h7.6z'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,10 +16,11 @@
     <div class="brand">
       <span class="brand-star">✦</span>
       <span class="brand-name">艾瑟兰</span>
-      <span class="brand-sub">星辉大陆</span>
+      <span class="brand-sub">三块大陆 · 一座空岛</span>
     </div>
     <nav class="tabs">
       <button class="tab active" data-tab="map">三维世界地图</button>
+      <button class="tab" data-tab="academy">星槎学院</button>
       <button class="tab" data-tab="lore">世界观设定</button>
       <button class="tab" data-tab="races">种族图鉴</button>
     </nav>
@@ -39,7 +40,9 @@
           <div class="hud-sub">点击势力，飞赴其疆域</div>
           <div id="legend-list"></div>
 
-          <div class="hud-sub hud-sub2">地标速览</div>
+          <div class="hud-sub hud-sub2">十四都 · 星槎</div>
+          <div id="place-caps"></div>
+          <div class="hud-sub hud-sub2">城 · 镇 · 村</div>
           <div id="place-list"></div>
         </div>
 
@@ -79,10 +82,85 @@
         <div class="loading-inner">
           <div class="loading-star">✦</div>
           <h1>艾瑟兰</h1>
-          <div class="loading-en">AETHERIA · THE STARFALL CONTINENT</div>
+          <div class="loading-en">AETHERIA · THREE CONTINENTS, ONE FLOATING ISLE</div>
           <div class="loading-bar"><span></span></div>
-          <p class="loading-tip">星陨之下，大陆正在苏醒……</p>
+          <p class="loading-tip">星陨之下，三块大陆正在苏醒……</p>
         </div>
+      </div>
+    </section>
+
+    <!-- ===================== 星槎学院 ===================== -->
+    <section id="tab-academy" class="tabpane lore-scroll">
+      <div class="academy-wrap">
+        <div class="academy-hero frame">
+          <img class="academy-hero-img" src="img/academy-hero.jpg" alt="星槎空岛全景">
+          <div class="academy-hero-veil"></div>
+          <div class="academy-hero-body">
+            <div class="lore-orn">────── ✦ ──────</div>
+            <h1>星槎学院</h1>
+            <div class="academy-en">XINGCHA ACADEMY · 悬于星辉裂隙之上</div>
+            <blockquote class="academy-motto" id="academy-motto"></blockquote>
+            <div class="academy-stats">
+              <div><span>创立</span><b id="academy-founded"></b></div>
+              <div><span>升空</span><b id="academy-lifted"></b></div>
+              <div><span>校长</span><b id="academy-head"></b></div>
+              <div><span>入学</span><b id="academy-admit"></b></div>
+            </div>
+          </div>
+        </div>
+
+        <section class="academy-section frame">
+          <div class="sec-head">
+            <span class="sec-no"><i>壹</i></span>
+            <h2>八百年的来历</h2>
+          </div>
+          <div id="academy-history" class="academy-history"></div>
+        </section>
+
+        <section class="academy-section frame">
+          <div class="sec-head">
+            <span class="sec-no"><i>贰</i></span>
+            <h2>四院</h2>
+          </div>
+          <p class="academy-note">台地升空那夜，四个学徒各抱着一根柱子没松手。那四根柱子，后来成了四院的院徽。分选的光落在哪一色上，学生就住在哪一色回廊的尽头。</p>
+          <div id="house-grid" class="house-grid"></div>
+        </section>
+
+        <section class="academy-section frame">
+          <div class="sec-head">
+            <span class="sec-no"><i>叁</i></span>
+            <h2>分选礼</h2>
+          </div>
+          <div class="sorting-row">
+            <img class="sorting-img" src="img/sorting-scene.jpg" alt="分选礼：星陨塔顶的裂隙晶">
+            <div class="sorting-body">
+              <h4>裂隙晶会问一个问题</h4>
+              <p id="academy-sorting"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="academy-section frame">
+          <div class="sec-head">
+            <span class="sec-no"><i>肆</i></span>
+            <h2>岛上的日子</h2>
+          </div>
+          <div class="academy-grid">
+            <div class="academy-col">
+              <h4 class="academy-col-h">仪典</h4>
+              <div id="academy-rituals"></div>
+            </div>
+            <div class="academy-col">
+              <h4 class="academy-col-h">建筑</h4>
+              <div id="academy-buildings"></div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="lore-foot">
+          <div class="lore-orn">────── ✦ ──────</div>
+          <p>在三维地图里点击裂隙上方的空岛，可以飞赴星槎。潮汐之夜，整座岛会随光微微起伏。</p>
+        </footer>
       </div>
     </section>
 
@@ -93,16 +171,16 @@
         <div class="lore-hero frame">
           <div class="lore-orn">────── ✦ ──────</div>
           <h1 id="lore-name">艾瑟兰</h1>
-          <div class="lore-en" id="lore-en">AETHERIA · THE STARFALL CONTINENT</div>
+          <div class="lore-en" id="lore-en">AETHERIA · THREE CONTINENTS, ONE FLOATING ISLE</div>
           <blockquote>
             <p id="lore-epigraph"></p>
             <cite id="lore-epigraph-source"></cite>
           </blockquote>
           <div class="lore-chips">
             <span>高奇幻 · 剑与魔法</span>
-            <span>十四势力 · 十四城</span>
+            <span>三大陆 · 十四势力 · 四十二城</span>
             <span id="lore-year">星辉历 412 年</span>
-            <span>三河两湖 · 雾沼</span>
+            <span>四河四湖 · 雾沼 · 星槎空岛</span>
           </div>
         </div>
 
@@ -177,7 +255,7 @@
         <div class="races-hero frame">
           <div class="lore-orn">────── ✦ ──────</div>
           <h1>种族图鉴</h1>
-          <p>《白冠之誓》下，大陆为十四势力共有：人类四王一岛，精灵两林，矮人两山，兽人两团，半身人一谷一盟——一影在极北的雾中守望。以下条目摘自《白冠圣典 · 异族卷》、银叶王国档案馆、灰港商会账册与黑牙堡的战鼓记录。</p>
+          <p>《白冠之誓》下，三块大陆为十四势力共有：人类四王一岛，精灵两林，矮人两山，兽人两团，半身人一谷一盟——一影在北方独立的大陆上，隔着暮影海峡守望。以下条目摘自《白冠圣典 · 异族卷》、银叶王国档案馆、灰港商会账册与黑牙堡的战鼓记录。</p>
         </div>
         <div id="race-grid" class="race-grid"></div>
         <footer class="lore-foot">
