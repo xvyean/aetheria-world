@@ -3,26 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>艾瑟兰 · 三块大陆 — 3D 剑与魔法世界</title>
-<meta name="description" content="艾瑟兰（Aetheria）——一个剑与魔法的三维奇幻世界：三块大陆、碎浪群岛、四河四湖、十四势力四十二城，以及悬在星辉裂隙上的空岛学府星槎学院。">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e8b84a' d='M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.4-6.3 4.4L8 13.8 2 9.2h7.6z'/%3E%3C/svg%3E">
+<title>艾瑟兰 · 余光未尽</title>
+<meta name="description" content="艾瑟兰——海里躺着一颗没死完的星。星槎是八百年前没捞到它的那条船。三块大陆、十四势力、四十二城，以及悬在裂隙上的学府。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c9a14a' d='M12 2l1.2 6.2L20 7l-5.2 3.6L18 17l-6-3.8L6 17l3.2-6.4L4 7l6.8 1.2z'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div id="app">
-  <!-- ===================== 顶栏 ===================== -->
   <header id="topbar">
     <div class="brand">
       <span class="brand-star">✦</span>
       <span class="brand-name">艾瑟兰</span>
-      <span class="brand-sub">三块大陆 · 一座空岛</span>
+      <span class="brand-sub">一颗未死的星 · 一条未落的船</span>
     </div>
     <nav class="tabs">
-      <button class="tab active" data-tab="map">三维世界地图</button>
+      <button class="tab active" data-tab="map">三维世界</button>
       <button class="tab" data-tab="academy">星槎学院</button>
-      <button class="tab" data-tab="lore">世界观设定</button>
-      <button class="tab" data-tab="races">种族图鉴</button>
+      <button class="tab" data-tab="lore">余光备忘</button>
+      <button class="tab" data-tab="races">诸族</button>
     </nav>
   </header>
 
@@ -82,85 +81,78 @@
         <div class="loading-inner">
           <div class="loading-star">✦</div>
           <h1>艾瑟兰</h1>
-          <div class="loading-en">AETHERIA · THREE CONTINENTS, ONE FLOATING ISLE</div>
+          <div class="loading-en">AETHERIA · A STAR THAT HAS NOT FINISHED DYING</div>
           <div class="loading-bar"><span></span></div>
-          <p class="loading-tip">星陨之下，三块大陆正在苏醒……</p>
+          <p class="loading-tip">船还停在热气上……</p>
         </div>
       </div>
     </section>
 
     <!-- ===================== 星槎学院 ===================== -->
-    <section id="tab-academy" class="tabpane lore-scroll">
-      <div class="academy-wrap">
-        <div class="academy-hero frame">
-          <img class="academy-hero-img" src="img/academy-hero.jpg" alt="星槎空岛全景">
-          <div class="academy-hero-veil"></div>
-          <div class="academy-hero-body">
-            <div class="lore-orn">────── ✦ ──────</div>
-            <h1>星槎学院</h1>
-            <div class="academy-en">XINGCHA ACADEMY · 悬于星辉裂隙之上</div>
-            <blockquote class="academy-motto" id="academy-motto"></blockquote>
-            <div class="academy-stats">
-              <div><span>创立</span><b id="academy-founded"></b></div>
-              <div><span>升空</span><b id="academy-lifted"></b></div>
-              <div><span>校长</span><b id="academy-head"></b></div>
-              <div><span>入学</span><b id="academy-admit"></b></div>
-            </div>
+    <section id="tab-academy" class="tabpane">
+      <div class="academy-stage">
+        <canvas id="academy-canvas"></canvas>
+        <div class="ac-hud">
+          <div class="ac-title">
+            <h2>星槎</h2>
+            <p>一条没接住星的船 · 停在热气上八百年</p>
+          </div>
+          <div class="ac-status" id="ac-status">正在把船从裂隙上捞上来……</div>
+          <div class="ac-hover" id="ac-hover"></div>
+          <div class="ac-btns" id="ac-building-btns"></div>
+          <div class="ctl-group ac-night">
+            <button class="ctl-btn" id="btn-ac-day">昼</button>
+            <button class="ctl-btn" id="btn-ac-night">暮</button>
           </div>
         </div>
+        <aside id="ac-inspect">
+          <span class="ac-kicker">点到的地方</span>
+          <h3 id="ac-name">账桅</h3>
+          <p id="ac-desc">原来是星槎的桅。八百年里被人用石头一圈圈裹起来，外面挂着铜账板。桅顶是裂隙晶。校长睡在桅里。校长的床不是景点。</p>
+        </aside>
+      </div>
 
-        <section class="academy-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>壹</i></span>
-            <h2>八百年的来历</h2>
-          </div>
-          <div id="academy-history" class="academy-history"></div>
-        </section>
+      <div class="academy-docs lore-scroll">
+        <div class="academy-wrap">
+          <section class="academy-section frame">
+            <div class="sec-head"><span class="sec-no"><i>壹</i></span><h2>一笔失败</h2></div>
+            <div id="academy-history" class="academy-history"></div>
+            <div class="academy-stats-row" id="academy-stats-row"></div>
+          </section>
 
-        <section class="academy-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>贰</i></span>
-            <h2>四院</h2>
-          </div>
-          <p class="academy-note">台地升空那夜，四个学徒各抱着一根柱子没松手。那四根柱子，后来成了四院的院徽。分选的光落在哪一色上，学生就住在哪一色回廊的尽头。</p>
-          <div id="house-grid" class="house-grid"></div>
-        </section>
+          <section class="academy-section frame">
+            <div class="sec-head"><span class="sec-no"><i>贰</i></span><h2>四个答案</h2></div>
+            <p class="academy-note">分选不看你像谁。裂隙晶问的意思永远是同一句，措辞每次不同：这一年的光，你要花在什么上？院籍是宿舍和炉子的分配，不是灵魂的盖章。</p>
+            <div id="house-grid" class="house-grid"></div>
+          </section>
 
-        <section class="academy-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>叁</i></span>
-            <h2>分选礼</h2>
-          </div>
-          <div class="sorting-row">
-            <img class="sorting-img" src="img/sorting-scene.jpg" alt="分选礼：星陨塔顶的裂隙晶">
-            <div class="sorting-body">
-              <h4>裂隙晶会问一个问题</h4>
+          <section class="academy-section frame">
+            <div class="sec-head"><span class="sec-no"><i>叁</i></span><h2>分选礼</h2></div>
+            <div class="sorting-body-only">
+              <h4>灰即无院。八百年两例。</h4>
               <p id="academy-sorting"></p>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section class="academy-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>肆</i></span>
-            <h2>岛上的日子</h2>
-          </div>
-          <div class="academy-grid">
-            <div class="academy-col">
-              <h4 class="academy-col-h">仪典</h4>
-              <div id="academy-rituals"></div>
+          <section class="academy-section frame">
+            <div class="sec-head"><span class="sec-no"><i>肆</i></span><h2>岛上的日子</h2></div>
+            <div class="academy-grid">
+              <div class="academy-col">
+                <h4 class="academy-col-h">仪典</h4>
+                <div id="academy-rituals"></div>
+              </div>
+              <div class="academy-col">
+                <h4 class="academy-col-h">船上还认得的地方</h4>
+                <div id="academy-buildings"></div>
+              </div>
             </div>
-            <div class="academy-col">
-              <h4 class="academy-col-h">建筑</h4>
-              <div id="academy-buildings"></div>
-            </div>
-          </div>
-        </section>
+          </section>
 
-        <footer class="lore-foot">
-          <div class="lore-orn">────── ✦ ──────</div>
-          <p>在三维地图里点击裂隙上方的空岛，可以飞赴星槎。潮汐之夜，整座岛会随光微微起伏。</p>
-        </footer>
+          <footer class="lore-foot">
+            <div class="lore-orn">────── ✦ ──────</div>
+            <p>上面的模型是这条船。点它。潮汐夜里它会自己晃一下——学生管这叫上课铃。</p>
+          </footer>
+        </div>
       </div>
     </section>
 
@@ -171,96 +163,73 @@
         <div class="lore-hero frame">
           <div class="lore-orn">────── ✦ ──────</div>
           <h1 id="lore-name">艾瑟兰</h1>
-          <div class="lore-en" id="lore-en">AETHERIA · THREE CONTINENTS, ONE FLOATING ISLE</div>
+          <div class="lore-en" id="lore-en">AETHERIA</div>
           <blockquote>
             <p id="lore-epigraph"></p>
             <cite id="lore-epigraph-source"></cite>
           </blockquote>
           <div class="lore-chips">
-            <span>高奇幻 · 剑与魔法</span>
+            <span>余光 · 不是祝福</span>
             <span>三大陆 · 十四势力 · 四十二城</span>
-            <span id="lore-year">星辉历 412 年</span>
-            <span>四河四湖 · 雾沼 · 星槎空岛</span>
+            <span id="lore-year">余光历 412 年</span>
+            <span>一条还没落下的船</span>
           </div>
         </div>
 
-        <!-- 创世神话 -->
         <section class="lore-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>壹</i></span>
-            <h2>创世神话 · 星陨创世</h2>
-          </div>
-          <p class="dropcap">起初，没有大地，没有天空，只有无边无际的虚空之洋。星辉女神<span class="hl-gold">艾瑟拉</span>在虚空中行走、歌唱，她的歌声所及之处，海水便从虚空中醒来。那是世界之前唯一的声音。</p>
-          <p>直到虚空之蛇<span class="hl-purple">沃伊德</span>醒来。它与星辉女神缠斗七日七夜，星辰一颗接一颗坠落。第九日黄昏，沃伊德逃回虚心的深处，而女神倒在虚空中，再未站起——她的血与泪化作无数星辰碎片，坠入大海。那便是<span class="hl-gold">大星陨</span>。</p>
-          <p>碎片所沉之处，大地隆起。最大的碎片落在世界中央，至今仍在燃烧，那便是<span class="hl-cyan">星辉裂隙</span>；较小的碎片散作种子，长成森林、河流，与第一批呼吸着的生灵。碎片里不灭的光，被世界的人称为「星辉」——一切魔法的源头。这片大陆，因此得名<span class="hl-gold">艾瑟兰</span>。</p>
+          <div class="sec-head"><span class="sec-no"><i>壹</i></span><h2>创世 · 三种说法，互不相让</h2></div>
+          <p class="dropcap">海里躺着一颗没死完的星。世上所有的法术，都是在花它还没散尽的热。花得越多，这颗星死得越快。其余都是注释。</p>
+          <p><span class="hl-gold">铜板上的三句。</span>账桅底层有一块锤音院保管的铜板，锈得几乎摸不出字。学院认它作最老的文献。上面只有三句：「星落海中，未死。人去捞，未得。船停在光上，至今。」锤音院的人以此为荣：宇宙起源不必比一张工单更长。</p>
+          <p><span class="hl-gold">晨晖的说法。</span>黄金大教堂的《白冠圣典》把那颗星写成女神<span class="hl-gold">艾瑟拉</span>。她不是坠落，是赴约。虚空里有一条饿了太久的东西（圣典称它<span class="hl-purple">沃伊德</span>，灰港水手称它“那条不肯被命名的”），女神与它缠了九日。第九日黄昏她选择落下，好让热留在海里，人才能有早晨。卫晚潮在学院年鉴里批过一行小字：「动听的账，通常不算。」</p>
+          <p><span class="hl-cyan">暮影的说法。</span>无影城不承认“坠落”这个词。他们说那颗星是被拉开的。谁拉的，他们不讲。他们只讲后果：光一旦被当成燃料，影子就开始向光借贷。暮影族是世界上唯一把这笔贷还清的人——他们不再花光，于是不再投下影子，于是死亡也收不回他们。五族称此为灾。暮影称此为清醒。</p>
+          <p>三种说法在星槎都准讲。不准的是假装它们是同一个故事。</p>
         </section>
 
-        <!-- 纪元年表 -->
         <section class="lore-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>贰</i></span>
-            <h2>纪元年表</h2>
-          </div>
+          <div class="sec-head"><span class="sec-no"><i>贰</i></span><h2>年表（船上的写法）</h2></div>
           <div id="chronicle-list" class="chronicle"></div>
         </section>
 
-        <!-- 地理志 -->
         <section class="lore-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>叁</i></span>
-            <h2>地理志</h2>
-          </div>
+          <div class="sec-head"><span class="sec-no"><i>叁</i></span><h2>地理志</h2></div>
           <div class="geo-grid" id="geo-grid"></div>
         </section>
 
-        <!-- 星辉魔法 -->
         <section class="lore-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>肆</i></span>
-            <h2>星辉魔法</h2>
-          </div>
+          <div class="sec-head"><span class="sec-no"><i>肆</i></span><h2>余光</h2></div>
           <p class="magic-intro" id="magic-intro"></p>
           <div id="school-grid" class="school-grid"></div>
         </section>
 
-        <!-- 神器图鉴 -->
         <section class="lore-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>伍</i></span>
-            <h2>神器图鉴</h2>
-          </div>
+          <div class="sec-head"><span class="sec-no"><i>伍</i></span><h2>还没花完的物件</h2></div>
           <div id="artifact-list" class="artifact-list"></div>
         </section>
 
-        <!-- 名词典 -->
         <section class="lore-section frame">
-          <div class="sec-head">
-            <span class="sec-no"><i>陆</i></span>
-            <h2>名词典</h2>
-          </div>
+          <div class="sec-head"><span class="sec-no"><i>陆</i></span><h2>名词</h2></div>
           <div id="glossary-table" class="glossary"></div>
         </section>
 
         <footer class="lore-foot">
           <div class="lore-orn">────── ✦ ──────</div>
-          <p>艾瑟兰是一个原创高奇幻世界，其气质受 D&D 与剑与魔法传统启发。所有种族、地名、人物与故事均为虚构。</p>
+          <p>本文摘自星槎内部传阅的《余光备忘》。它不是圣典。圣典在晨晖，账在锤音，歌在两林，鼓在荒原。</p>
         </footer>
-
       </div>
     </section>
 
-    <!-- ===================== 种族图鉴 ===================== -->
+    <!-- ===================== 诸族 ===================== -->
     <section id="tab-races" class="tabpane lore-scroll">
       <div class="races-wrap">
         <div class="races-hero frame">
           <div class="lore-orn">────── ✦ ──────</div>
-          <h1>种族图鉴</h1>
-          <p>《白冠之誓》下，三块大陆为十四势力共有：人类四王一岛，精灵两林，矮人两山，兽人两团，半身人一谷一盟——一影在北方独立的大陆上，隔着暮影海峡守望。以下条目摘自《白冠圣典 · 异族卷》、银叶王国档案馆、灰港商会账册与黑牙堡的战鼓记录。</p>
+          <h1>诸族</h1>
+          <p>不当属性模板写。耗光是他们花得响不响，记账是他们记不记得，惜年是他们在不在乎余年这个数字。数字是船上的偏见，不是真理。</p>
         </div>
         <div id="race-grid" class="race-grid"></div>
         <footer class="lore-foot">
           <div class="lore-orn">────── ✦ ──────</div>
-          <p>※ 图鉴中的人口与寿命为星辉历 412 年的估算值。暮影领的数据，来自不愿意透露姓名的商人。</p>
+          <p>※ 人口为余光历 412 年的估算。暮影领的数据，来自不愿意透露姓名的商人。</p>
         </footer>
       </div>
     </section>
@@ -269,10 +238,12 @@
 
 <script src="vendor/three.min.js"></script>
 <script src="vendor/OrbitControls.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
 <script src="js/noise.js"></script>
 <script src="js/terrain.js"></script>
 <script src="js/data.js"></script>
 <script src="js/world.js"></script>
+<script src="js/academy-view.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

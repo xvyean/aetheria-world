@@ -1054,97 +1054,48 @@ var World = (function () {
     var p = { x: RIFT_POS[0], z: RIFT_POS[1] };
     var y0 = sampleH(p.x, p.z);
     academyBaseY = y0 + 104;
-    var g = new THREE.Group();
-    g.position.set(p.x, academyBaseY, p.z);
+    var holder = new THREE.Group();
+    holder.position.set(p.x, academyBaseY, p.z);
+    scene.add(holder);
+    academy = holder;
 
-    var rockMat = stdMat(0x6f6660, { roughness: 1 });
-    addMesh(g, new THREE.CylinderGeometry(30, 24, 4.5, 18), rockMat, 0, 0, 0);
-    var bottom = addMesh(g, new THREE.ConeGeometry(24, 30, 14), rockMat, 0, -17, 0);
-    bottom.rotation.x = Math.PI;
-    // 散落的浮岩
-    Noise.srand(88221);
-    for (var fr = 0; fr < 8; fr++) {
-      var fa = Noise.rand() * Math.PI * 2;
-      var fr2 = 35 + Noise.rand() * 20;
-      var f = addMesh(g, new THREE.DodecahedronGeometry(1.4 + Noise.rand() * 2.4, 0), rockMat,
-        Math.cos(fa) * fr2, -2 - Noise.rand() * 16, Math.sin(fa) * fr2);
-      f.rotation.set(Noise.rand() * 3, Noise.rand() * 3, Noise.rand() * 3);
+    function decorate(model) {
+      model.scale.setScalar(0.52);
+      model.rotation.y = Math.PI * 0.08;
+      model.traverse(function (o) {
+        if (o.isMesh) {
+          o.castShadow = true;
+          o.receiveShadow = true;
+        }
+        if (o.name === 'SortingCrystal') academyCrystal = o;
+      });
+      holder.add(model);
     }
-    // 草皮
-    var soil = new THREE.Mesh(new THREE.CylinderGeometry(29.4, 29.4, 0.7, 18), stdMat(0x4a6a35, { roughness: 1 }));
-    soil.position.y = 2.6;
-    g.add(soil);
 
-    // 星陨塔（岛心主塔）
-    var towerMat = stdMat(0xe8e4d8, { roughness: 0.55 });
-    addMesh(g, new THREE.CylinderGeometry(3.4, 5.2, 30, 12), towerMat, 0, 17.5, 0);
-    addMesh(g, new THREE.CylinderGeometry(2.4, 3.4, 8, 12), towerMat, 0, 36, 0);
-    addMesh(g, new THREE.ConeGeometry(3.3, 9, 12), stdMat(0xd9b45b, { metalness: 0.4, roughness: 0.4 }), 0, 43, 0);
-    academyCrystal = new THREE.Mesh(
-      new THREE.OctahedronGeometry(2.6),
-      stdMat(0xbfefff, { emissive: 0x54d4f4, emissiveIntensity: 2, roughness: 0.2 })
-    );
-    academyCrystal.position.set(0, 50.5, 0);
-    academyCrystal.scale.set(1, 1.7, 1);
-    academyCrystal.castShadow = true;
-    g.add(academyCrystal);
-    addGlow(g, 0x8fe8ff, 24, 0.5, 0, 50.5, 0);
+    function fallback() {
+      var rock = new THREE.Mesh(
+        new THREE.CylinderGeometry(16, 12, 4, 12),
+        stdMat(0x6f6660, { roughness: 1 })
+      );
+      holder.add(rock);
+      var cry = new THREE.Mesh(
+        new THREE.OctahedronGeometry(2.4),
+        stdMat(0xbfefff, { emissive: 0x54d4f4, emissiveIntensity: 2, roughness: 0.2 })
+      );
+      cry.position.y = 22;
+      holder.add(cry);
+      academyCrystal = cry;
+      addGlow(holder, 0x8fe8ff, 28, 0.4, 0, 8, 0);
+    }
 
-    // 四院尖塔（四角，各用本院色彩）
-    var houses = [
-      { c: 0xe8b45b, hex: '#e8b45b', a: Math.PI / 4 },       // 晨辉
-      { c: 0x2f8a4a, hex: '#2f8a4a', a: Math.PI * 3 / 4 },    // 星语
-      { c: 0xc97a4a, hex: '#c97a4a', a: Math.PI * 5 / 4 },    // 锤音
-      { c: 0x4a9dc9, hex: '#4a9dc9', a: Math.PI * 7 / 4 }     // 海心
-    ];
-    for (var hi = 0; hi < houses.length; hi++) {
-      var hv = houses[hi];
-      var hx = Math.cos(hv.a) * 18, hz = Math.sin(hv.a) * 18;
-      addMesh(g, new THREE.CylinderGeometry(1.9, 2.6, 15, 8), stdMat(0xe4e0d4, { roughness: 0.6 }), hx, 10, hz);
-      addMesh(g, new THREE.ConeGeometry(2.7, 7, 8), stdMat(hv.c, { metalness: 0.35, roughness: 0.5 }), hx, 20, hz);
-      var hb = addGlow(g, hv.c, 10, 0.42, hx, 23, hz);
-      beacons.push({ sprite: hb, baseScale: 10, baseOpacity: 0.42, color: hv.hex });
-      // 回廊（岛心 → 院塔）
-      var len = 18 - 3;
-      var walk = addMesh(g, new THREE.BoxGeometry(len, 0.7, 2.4), stdMat(0xcfc8b8, { roughness: 0.8 }),
-        Math.cos(hv.a) * 9.5, 3.4, Math.sin(hv.a) * 9.5);
-      walk.rotation.y = -hv.a + Math.PI / 2;
+    if (typeof THREE.GLTFLoader === 'function') {
+      var loader = new THREE.GLTFLoader();
+      loader.load('models/academy.glb', function (gltf) {
+        decorate(gltf.scene);
+      }, undefined, function () { fallback(); });
+    } else {
+      fallback();
     }
-    // 宿舍环（岛缘小屋）
-    for (var dr = 0; dr < 12; dr++) {
-      var da = dr / 12 * Math.PI * 2 + 0.26;
-      if (Math.abs(Math.sin(da)) > 0.92 && Math.abs(Math.cos(da)) > 0.92) continue;
-      var dx = Math.cos(da) * 25, dz = Math.sin(da) * 25;
-      var dh = addMesh(g, new THREE.SphereGeometry(1.9, 8, 6), stdMat(0xe4ddcc), dx, 3.2, dz);
-      dh.scale.set(1.15, 0.8, 1.15);
-      var dr2 = addMesh(g, new THREE.ConeGeometry(2.2, 1.8, 8), stdMat(houses[dr % 4].c, { roughness: 0.6 }), dx, 5.4, dz);
-      dr2.rotation.y = da;
-    }
-    // 星穗馆（圆顶图书馆）
-    addMesh(g, new THREE.SphereGeometry(4.6, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2),
-      stdMat(0xd9b45b, { metalness: 0.45, roughness: 0.35 }), -11, 2.9, -13);
-    addMesh(g, new THREE.CylinderGeometry(4.8, 5.1, 1.6, 14), stdMat(0xe8e4d8), -11, 3.2, -13);
-    // 浮池（悬在岛缘、水不落的水池）
-    var pool = new THREE.Mesh(
-      new THREE.CircleGeometry(5.2, 24),
-      new THREE.MeshStandardMaterial({ color: C(0x3a9dc0), roughness: 0.15, metalness: 0.1, emissive: C(0x1a4a66), emissiveIntensity: 0.5 })
-    );
-    pool.rotation.x = -Math.PI / 2;
-    pool.position.set(13, 4.2, -11);
-    g.add(pool);
-    // 岛上小树
-    for (var at = 0; at < 7; at++) {
-      var aa = Noise.rand() * Math.PI * 2;
-      var ar = 14 + Noise.rand() * 10;
-      var ax = Math.cos(aa) * ar, az = Math.sin(aa) * ar;
-      if (Math.hypot(ax, az) < 8) continue;
-      addMesh(g, new THREE.CylinderGeometry(0.24, 0.4, 1.8, 5), stdMat(0x6b4a30), ax, 3.8, az);
-      addMesh(g, new THREE.ConeGeometry(1.3, 3.0, 7), stdMat(0x245c34), ax, 6.4, az);
-    }
-    addGlow(g, 0x8fe8ff, 30, 0.3, 0, -14, 0);
-
-    scene.add(g);
-    academy = g;
   }
 
   /* ---------------- 星辉流（裂隙 → 各首都） ---------------- */

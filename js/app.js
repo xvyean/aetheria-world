@@ -8,6 +8,8 @@
 
   /* ---------------- 启动 3D 世界（最先执行，供后续 UI 绑定） ---------------- */
   World.init();
+  if (window.AcademyView) AcademyView.init();
+
 
   function factionById(id) {
     for (var i = 0; i < FACTIONS.length; i++) {
@@ -30,6 +32,9 @@
     }
     if (id === 'map') {
       requestAnimationFrame(function () { World.resize(); });
+    }
+    if (id === 'academy' && window.AcademyView) {
+      requestAnimationFrame(function () { AcademyView.resize(); });
     }
   }
 
@@ -239,8 +244,8 @@
       var rels = '';
       for (var ri = 0; ri < r.rels.length; ri++) {
         var rel = r.rels[ri];
-        var tone = rel[1] === '宿敌' || rel[1] === '世仇' || rel[1] === '敌对' || rel[1] === '憎恶'
-          ? 'hostile' : (rel[1] === '友善' || rel[1] === '盟友' || rel[1] === '互敬'
+        var tone = /宿敌|世仇|敌对|憎恶|北征|恐惧|偷/.test(rel[1])
+          ? 'hostile' : (/友善|盟友|互敬|血誓|主顾/.test(rel[1])
           ? 'friend' : 'neutral');
         rels += '<span class="rel-chip ' + tone + '"><b>' + rel[0] + '</b>' + rel[1] + '</span>';
       }
@@ -257,7 +262,7 @@
         '<div><span>领地</span>' + r.territory + '</div>' +
         '</div>' +
         '<div class="race-bars">' +
-        bar('体魄', r.st['体魄']) + bar('魅力', r.st['魅力']) + bar('智慧', r.st['智慧']) +
+        bar('耗光', r.st['耗光']) + bar('记账', r.st['记账']) + bar('惜年', r.st['惜年']) +
         '</div>' +
         '<p class="race-lore">' + r.lore + '</p>' +
         '<div class="race-facts">' +
@@ -274,11 +279,66 @@
   /* ---------------- 星槎学院：动态注入 ---------------- */
 
   var A = ACADEMY;
-  document.getElementById('academy-motto').textContent = '“' + A.motto + '”';
-  document.getElementById('academy-founded').textContent = A.founded;
-  document.getElementById('academy-lifted').textContent = A.lifted;
-  document.getElementById('academy-head').textContent = A.head;
-  document.getElementById('academy-admit').textContent = A.admission;
+  var statsRow = document.getElementById('academy-stats-row');
+  if (statsRow) {
+    statsRow.innerHTML =
+      '<div><span>创立</span><b>' + A.founded + '</b></div>' +
+      '<div><span>升船</span><b>' + A.lifted + '</b></div>' +
+      '<div><span>校长</span><b>' + A.head + '</b></div>' +
+      '<div><span>入学</span><b>' + A.admission + '</b></div>';
+  }
+
+  function houseSigil(id) {
+    if (id === 'dawn') return '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="18" y="14" width="28" height="36" rx="2"/><path d="M24 50 V58 M40 50 V58"/><path d="M32 22 L32 38"/><circle cx="32" cy="20" r="4" fill="currentColor" stroke="none"/></svg>';
+    if (id === 'speak') return '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16 H48 M16 28 H40 M16 40 H44 M16 52 H28"/></svg>';
+    if (id === 'forge') return '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 40 H52 L46 48 H18 Z"/><path d="M24 40 V22 H40 V40"/><path d="M20 22 H44"/></svg>';
+    return '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="32" cy="44" rx="18" ry="8"/><path d="M32 16 V36"/><circle cx="32" cy="16" r="5"/></svg>';
+  }
+
+  function showInspect(b) {
+    if (!b) return;
+    var n = document.getElementById('ac-name');
+    var d = document.getElementById('ac-desc');
+    if (n) n.textContent = b.name;
+    if (d) d.textContent = b.desc;
+  }
+
+  if (window.AcademyView) {
+    AcademyView.onPick(function (b) { if (b) showInspect(b); });
+  }
+  var btns = document.getElementById('ac-building-btns');
+  if (btns && A.buildings) {
+    var bh = '';
+    for (var bi = 0; bi < A.buildings.length; bi++) {
+      var bd = A.buildings[bi];
+      bh += '<button class="ac-pin" data-id="' + bd.id + '">' + bd.name + '</button>';
+    }
+    btns.innerHTML = bh;
+    var pins = btns.querySelectorAll('.ac-pin');
+    for (var pj = 0; pj < pins.length; pj++) {
+      (function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-id');
+          for (var k = 0; k < A.buildings.length; k++) {
+            if (A.buildings[k].id === id) showInspect(A.buildings[k]);
+          }
+          if (window.AcademyView) AcademyView.flyTo(id);
+        });
+      })(pins[pj]);
+    }
+  }
+  var dayBtn = document.getElementById('btn-ac-day');
+  var nightBtn = document.getElementById('btn-ac-night');
+  if (dayBtn) dayBtn.addEventListener('click', function () {
+    if (window.AcademyView) AcademyView.setNight(false);
+    dayBtn.classList.add('active'); if (nightBtn) nightBtn.classList.remove('active');
+  });
+  if (nightBtn) nightBtn.addEventListener('click', function () {
+    if (window.AcademyView) AcademyView.setNight(true);
+    nightBtn.classList.add('active'); if (dayBtn) dayBtn.classList.remove('active');
+  });
+  if (dayBtn) dayBtn.classList.add('active');
+
 
   var histEl = document.getElementById('academy-history');
   if (histEl) {
@@ -291,13 +351,12 @@
 
   var houseEl = document.getElementById('house-grid');
   if (houseEl) {
-    var imgMap = { dawn: 'house-dawn.png', speak: 'house-speak.png', forge: 'house-forge.png', tide: 'house-tide.png' };
     var hh2 = '';
     for (var hj = 0; hj < A.houses.length; hj++) {
       var hs = A.houses[hj];
       hh2 +=
         '<article class="house-card" style="--hc:' + hs.color + '">' +
-        '<div class="house-emblem"><img src="img/' + (imgMap[hs.id] || '') + '" alt="' + hs.sigil + '徽记"></div>' +
+        '<div class="house-emblem" style="color:' + hs.color + '">' + houseSigil(hs.id) + '</div>' +
         '<div class="house-head">' +
         '<h3>' + hs.name + '</h3>' +
         '<p class="house-motto">“' + hs.motto + '”</p>' +
