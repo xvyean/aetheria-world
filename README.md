@@ -28,6 +28,21 @@
 | 渲染 | 六机位×三氛围 | 九机位×三氛围（暮潮/晨辉/星夜），Cycles 输出；含世界场景机位（裂隙光柱+灰港灯火+海面） |
 | 网页 | 学院页 + 旧世界页 | **学院手册页**（`academy.html`：3D 查看器可点建筑看志 + 四院/十谜/岛规/人物/世界五页签，GLB 加载失败自动降级平面图）+ **世界舆图页**（`world-modern.html`：三维度势力城点图，含“第 43 个点”的谜） |
 
+## 版本谱系
+
+`main` 只承载整理、验证过的综合版——即当前 v5。历史上的创作路线已按用户（xvyean）的整理拆分为独立分支，互不覆盖：
+
+| 分支 | 内容 | 基线 |
+| --- | --- | --- |
+| [`version/v1-original`](https://github.com/xvyean/aetheria-world/tree/version/v1-original) | 最初的单大陆 3D 奇幻世界 | `f92382c` |
+| [`version/v2-expanded-world`](https://github.com/xvyean/aetheria-world/tree/version/v2-expanded-world) | 三河两湖、十四势力的大陆级扩展 | `28e59a8` |
+| [`version/v3-three-continents`](https://github.com/xvyean/aetheria-world/tree/version/v3-three-continents) | 三块大陆、四十二城、初版星槎学院 | `1e34911` |
+| [`version/v4-afterglow`](https://github.com/xvyean/aetheria-world/tree/version/v4-afterglow) | 《余光未尽》设定与船岛 GLB | `b43fde1` |
+| [`version/v4-blender-academy`](https://github.com/xvyean/aetheria-world/tree/version/v4-blender-academy) | 独立 Blender 4.2 / Draco 学院方案 | `7ac41da` |
+| [`version/v4-modern-bible`](https://github.com/xvyean/aetheria-world/tree/version/v4-modern-bible) | v4 综合版快照（v5 之前的 main 状态） | `7ba3531` |
+
+完整的分支来源、选择建议与恢复方法见 [`VERSIONING.md`](VERSIONING.md)；给 AI 贡献者的仓库守则见 [`AGENTS.md`](AGENTS.md)——不直接在主分支开新方向、不提交冲突标记、提交前跑冲突检查与 `node --check`。
+
 ## 这是什么世界
 
 - **世界是一本账，不是一场战争。** 星辉（Aether）不是能量，是“光的状态”——星辰碎片坠海时留下的伤口，至今在渗光。一切魔法都是借光：以心焰为烛，引裂隙的光，**用了要还**。
