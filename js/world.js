@@ -1056,95 +1056,75 @@ var World = (function () {
     academyBaseY = y0 + 104;
     var g = new THREE.Group();
     g.position.set(p.x, academyBaseY, p.z);
+    var glow = addGlow(g, 0x8fe8ff, 30, 0.3, 0, -14, 0);
+    scene.add(g);
+    academy = g;
 
+    // 真正的模型：Blender 程序化建模 → Draco glTF（与「星槎学院」页共用同一文件）
+    // 世界地图比例较小，按 0.62 缩放（岛长约 56 m 地图单位），并把陪岛石轨道一并带上
+    if (!THREE.GLTFLoader) { buildAcademyFallback(g); return; }
+    var loader = new THREE.GLTFLoader();
+    if (THREE.DRACOLoader) {
+      var draco = new THREE.DRACOLoader();
+      draco.setDecoderPath('vendor/draco/');
+      draco.setDecoderConfig({ type: 'js' });
+      loader.setDRACOLoader(draco);
+    }
+    loader.load('models/xingcha_academy.glb', function (gltf) {
+      var root = gltf.scene;
+      var S = 0.62;
+      root.scale.set(S, S, S);
+      root.traverse(function (o) {
+        if (!o.isMesh) return;
+        var m = o.material, fx = o.userData.fx;
+        if (m) {
+          m.vertexColors = m.vertexColors || (o.geometry.attributes.color !== undefined);
+          if (fx === 'crystal') { m.emissiveIntensity = 3.0; academyCrystal = o; }
+          else if (fx === 'fire' || fx === 'lamp_main') m.emissiveIntensity = 2.0;
+          else if (fx === 'beam') o.visible = false;
+          if (m.transparent) { m.depthWrite = false; }
+        }
+        o.castShadow = !m || !m.transparent;
+        o.receiveShadow = true;
+        if (o.userData.orbit_r !== undefined) {
+          academyStones.push({ m: o, r: o.userData.orbit_r, a0: o.userData.orbit_a0, y: o.position.y, spin: o.userData.spin || 0, bob: o.userData.bob || 1, shard: fx === 'shard' });
+        }
+      });
+      g.add(root);
+      academyModel = root;
+    }, undefined, function (err) {
+      console.warn('academy glb failed, using fallback', err);
+      buildAcademyFallback(g);
+    });
+  }
+  var academyModel = null;
+  var academyStones = [];
+
+  // 兜底：无法载入 glTF（例如离线 file:// 打开）时的简版空岛
+  function buildAcademyFallback(g) {
     var rockMat = stdMat(0x6f6660, { roughness: 1 });
     addMesh(g, new THREE.CylinderGeometry(30, 24, 4.5, 18), rockMat, 0, 0, 0);
     var bottom = addMesh(g, new THREE.ConeGeometry(24, 30, 14), rockMat, 0, -17, 0);
     bottom.rotation.x = Math.PI;
-    // 散落的浮岩
-    Noise.srand(88221);
-    for (var fr = 0; fr < 8; fr++) {
-      var fa = Noise.rand() * Math.PI * 2;
-      var fr2 = 35 + Noise.rand() * 20;
-      var f = addMesh(g, new THREE.DodecahedronGeometry(1.4 + Noise.rand() * 2.4, 0), rockMat,
-        Math.cos(fa) * fr2, -2 - Noise.rand() * 16, Math.sin(fa) * fr2);
-      f.rotation.set(Noise.rand() * 3, Noise.rand() * 3, Noise.rand() * 3);
-    }
-    // 草皮
     var soil = new THREE.Mesh(new THREE.CylinderGeometry(29.4, 29.4, 0.7, 18), stdMat(0x4a6a35, { roughness: 1 }));
     soil.position.y = 2.6;
     g.add(soil);
-
-    // 星陨塔（岛心主塔）
     var towerMat = stdMat(0xe8e4d8, { roughness: 0.55 });
     addMesh(g, new THREE.CylinderGeometry(3.4, 5.2, 30, 12), towerMat, 0, 17.5, 0);
     addMesh(g, new THREE.CylinderGeometry(2.4, 3.4, 8, 12), towerMat, 0, 36, 0);
     addMesh(g, new THREE.ConeGeometry(3.3, 9, 12), stdMat(0xd9b45b, { metalness: 0.4, roughness: 0.4 }), 0, 43, 0);
-    academyCrystal = new THREE.Mesh(
-      new THREE.OctahedronGeometry(2.6),
-      stdMat(0xbfefff, { emissive: 0x54d4f4, emissiveIntensity: 2, roughness: 0.2 })
-    );
+    academyCrystal = new THREE.Mesh(new THREE.OctahedronGeometry(2.6), stdMat(0xbfefff, { emissive: 0x54d4f4, emissiveIntensity: 2, roughness: 0.2 }));
     academyCrystal.position.set(0, 50.5, 0);
     academyCrystal.scale.set(1, 1.7, 1);
-    academyCrystal.castShadow = true;
     g.add(academyCrystal);
     addGlow(g, 0x8fe8ff, 24, 0.5, 0, 50.5, 0);
-
-    // 四院尖塔（四角，各用本院色彩）
-    var houses = [
-      { c: 0xe8b45b, hex: '#e8b45b', a: Math.PI / 4 },       // 晨辉
-      { c: 0x2f8a4a, hex: '#2f8a4a', a: Math.PI * 3 / 4 },    // 星语
-      { c: 0xc97a4a, hex: '#c97a4a', a: Math.PI * 5 / 4 },    // 锤音
-      { c: 0x4a9dc9, hex: '#4a9dc9', a: Math.PI * 7 / 4 }     // 海心
-    ];
-    for (var hi = 0; hi < houses.length; hi++) {
-      var hv = houses[hi];
-      var hx = Math.cos(hv.a) * 18, hz = Math.sin(hv.a) * 18;
+    var houses = [0xe8b45b, 0x2f8a4a, 0xc97a4a, 0x4a9dc9];
+    for (var hi = 0; hi < 4; hi++) {
+      var ang = Math.PI / 4 + hi * Math.PI / 2;
+      var hx = Math.cos(ang) * 18, hz = Math.sin(ang) * 18;
       addMesh(g, new THREE.CylinderGeometry(1.9, 2.6, 15, 8), stdMat(0xe4e0d4, { roughness: 0.6 }), hx, 10, hz);
-      addMesh(g, new THREE.ConeGeometry(2.7, 7, 8), stdMat(hv.c, { metalness: 0.35, roughness: 0.5 }), hx, 20, hz);
-      var hb = addGlow(g, hv.c, 10, 0.42, hx, 23, hz);
-      beacons.push({ sprite: hb, baseScale: 10, baseOpacity: 0.42, color: hv.hex });
-      // 回廊（岛心 → 院塔）
-      var len = 18 - 3;
-      var walk = addMesh(g, new THREE.BoxGeometry(len, 0.7, 2.4), stdMat(0xcfc8b8, { roughness: 0.8 }),
-        Math.cos(hv.a) * 9.5, 3.4, Math.sin(hv.a) * 9.5);
-      walk.rotation.y = -hv.a + Math.PI / 2;
+      addMesh(g, new THREE.ConeGeometry(2.7, 7, 8), stdMat(houses[hi], { metalness: 0.35, roughness: 0.5 }), hx, 20, hz);
     }
-    // 宿舍环（岛缘小屋）
-    for (var dr = 0; dr < 12; dr++) {
-      var da = dr / 12 * Math.PI * 2 + 0.26;
-      if (Math.abs(Math.sin(da)) > 0.92 && Math.abs(Math.cos(da)) > 0.92) continue;
-      var dx = Math.cos(da) * 25, dz = Math.sin(da) * 25;
-      var dh = addMesh(g, new THREE.SphereGeometry(1.9, 8, 6), stdMat(0xe4ddcc), dx, 3.2, dz);
-      dh.scale.set(1.15, 0.8, 1.15);
-      var dr2 = addMesh(g, new THREE.ConeGeometry(2.2, 1.8, 8), stdMat(houses[dr % 4].c, { roughness: 0.6 }), dx, 5.4, dz);
-      dr2.rotation.y = da;
-    }
-    // 星穗馆（圆顶图书馆）
-    addMesh(g, new THREE.SphereGeometry(4.6, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2),
-      stdMat(0xd9b45b, { metalness: 0.45, roughness: 0.35 }), -11, 2.9, -13);
-    addMesh(g, new THREE.CylinderGeometry(4.8, 5.1, 1.6, 14), stdMat(0xe8e4d8), -11, 3.2, -13);
-    // 浮池（悬在岛缘、水不落的水池）
-    var pool = new THREE.Mesh(
-      new THREE.CircleGeometry(5.2, 24),
-      new THREE.MeshStandardMaterial({ color: C(0x3a9dc0), roughness: 0.15, metalness: 0.1, emissive: C(0x1a4a66), emissiveIntensity: 0.5 })
-    );
-    pool.rotation.x = -Math.PI / 2;
-    pool.position.set(13, 4.2, -11);
-    g.add(pool);
-    // 岛上小树
-    for (var at = 0; at < 7; at++) {
-      var aa = Noise.rand() * Math.PI * 2;
-      var ar = 14 + Noise.rand() * 10;
-      var ax = Math.cos(aa) * ar, az = Math.sin(aa) * ar;
-      if (Math.hypot(ax, az) < 8) continue;
-      addMesh(g, new THREE.CylinderGeometry(0.24, 0.4, 1.8, 5), stdMat(0x6b4a30), ax, 3.8, az);
-      addMesh(g, new THREE.ConeGeometry(1.3, 3.0, 7), stdMat(0x245c34), ax, 6.4, az);
-    }
-    addGlow(g, 0x8fe8ff, 30, 0.3, 0, -14, 0);
-
-    scene.add(g);
-    academy = g;
   }
 
   /* ---------------- 星辉流（裂隙 → 各首都） ---------------- */
@@ -1486,10 +1466,12 @@ var World = (function () {
 
   /* ---------------- 主循环 ---------------- */
 
+  var paused = false;
   function animate() {
     requestAnimationFrame(animate);
     var dt = Math.min(clock.getDelta(), 0.25);
     var t = clock.elapsedTime;
+    if (paused) return;
 
     if (fly) {
       fly.t += dt / fly.dur;
@@ -1527,6 +1509,12 @@ var World = (function () {
     if (academy) {
       academy.position.y = academyBaseY + Math.sin(t * 0.4) * 1.5;
       if (academyCrystal) academyCrystal.rotation.y = t * 0.6;
+      for (var si = 0; si < academyStones.length; si++) {
+        var st = academyStones[si];
+        var sa = st.a0 + t * (st.shard ? 0.6 : 2 * Math.PI / 200);
+        st.m.position.set(Math.cos(sa) * st.r, st.y + Math.sin(t * (st.shard ? 1.7 : 0.35) + st.a0 * 3) * (st.shard ? 0.25 : st.bob), -Math.sin(sa) * st.r);
+        st.m.rotation.y += (st.shard ? 1.2 : st.spin * 0.25) * dt;
+      }
     }
 
     renderer.render(scene, camera);
@@ -1566,7 +1554,7 @@ var World = (function () {
     flyToCity: function (data) {
       var c = data;
       var d;
-      if (c.id === 'academy') d = 190;
+      if (c.id === 'academy') d = 150;
       else if ((c.tier || 'capital') === 'capital') d = c.id === 'whitecrown' ? 260 : 200;
       else if (c.tier === 'city') d = 150;
       else if (c.tier === 'town') d = 115;
@@ -1580,7 +1568,7 @@ var World = (function () {
     },
     flyToAcademy: function () {
       if (!academy) return;
-      flyTo(new THREE.Vector3(RIFT_POS[0], academyBaseY + 14, RIFT_POS[1]), 200);
+      flyTo(new THREE.Vector3(RIFT_POS[0], academyBaseY + 12, RIFT_POS[1]), 150);
     },
     resetView: function () {
       fly = {
@@ -1597,6 +1585,7 @@ var World = (function () {
     },
     getAutoRotate: function () { return autoRotateOn; },
     onHover: function (cb) { onHoverCb = cb; },
-    onPick: function (cb) { onPickCb = cb; }
+    onPick: function (cb) { onPickCb = cb; },
+    setPaused: function (b) { paused = !!b; if (!b) clock.getDelta(); }
   };
 })();

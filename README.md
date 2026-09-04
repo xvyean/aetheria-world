@@ -6,7 +6,11 @@
 
 一个用代码铸造的剑与魔法三维世界
 
-`Three.js` · `程序化生成` · `高奇幻设定` · `灵感源于 D&D 传统`
+`Blender 程序化建模` · `glTF / Draco` · `Three.js` · `程序化地形` · `高奇幻设定`
+
+<img src="img/academy-hero.jpg" alt="星槎学院 · Blender 渲染" width="860">
+
+*星槎学院 —— 全部在 Blender 4.2 中由 Python 程序化建模，Cycles 渲染*
 
 </div>
 
@@ -51,11 +55,14 @@
 - ✨ 星辉流：从裂隙通往十三座首都的流光航线
 - 🖱️ 轨道相机（旋转 / 缩放 / 平移）、自动环绕、点击任一城镇 / 空岛打开志书卡片、图例点击飞赴势力疆域
 
-### 星槎学院（独立专题页）
-- 空岛全景 hero（AI 绘图）+ 八百年来历
-- **四院**：晨辉 / 星语 / 锤音 / 海心——院徽（AI 绘图）、学派、院德、院训、开院人、名士
-- **分选礼**场景与规则（AI 绘图）；星潮晚宴、四院星斗赛、熄灯钟
-- 建筑志：星陨塔 / 浮池 / 星穗馆 / 四院回廊
+### 星槎学院（独立专题页 · 真正的 3D 模型）
+- **Blender 程序化建模**：整座空岛由 `blender/academy/build.py` 在 Blender 4.2 中用 Python 生成——约 5,000 个部件、17.6 万顶点，全部按设定书（`docs/02-星槎志.md`）落位：
+  倒锥岛体与塔根、星陨塔与螺旋外梯、裂隙晶、四柱、四院四塔（晨辉火廊 / 星语观星台与浑仪 / 锤音炉口与誓铁墙 / 海心船形塔与长明灯）、七层星穗馆、校史馆、星潮厅、灶房梯田羊圈、烬园与熄灯钟楼、二十二栋按年份分的宿舍、千岁梧桐、槎埠栈桥、渡船「第二块石头」、浮池与云网、旧阶堆、马圈、三十四块陪岛石、云
+- **导出**：合并为 342 个网格，顶点色着色（无贴图），Draco 压缩 glTF 仅 **1.7 MB**；每个可动部件带 `extras`（fx 类型 / 轨道参数 / 志书键），网页据此点火、转晶、涨潮、开船、摆旗
+- **网页观览器**（`js/academy3d.js`）：着色器天空与云海、裂隙光柱与上升粒子、晨 / 午 / 夜三档氛围、渡船 90 秒潮汐往返、陪岛石公转、22 处**热点**——悬停高亮、点击飞入并翻开志书卡片、地名浮标自动避让与遮挡剔除、全屏、键盘翻页
+- **志书**：船票、槎埠时刻、摆渡人、四院（院长 / 院规 / 塔）、分选记录、星槎七律、十四贡、仪典、建模札记
+- 同一个 GLB 也被放进世界地图的裂隙上空（缩放 0.62），点击「星槎学院」即可飞赴
+- 八个机位的 Cycles 成图：`models/render_*.png`
 
 ### 世界观设定
 - 创世神话（星陨创世）
@@ -83,29 +90,58 @@ python3 -m http.server 8080
 # 然后访问 http://localhost:8080
 ```
 
-> Three.js r128 已内置于 `vendor/` 目录，**无需联网、无需 npm 安装**。
+> Three.js r128、GLTFLoader、DRACOLoader 与 draco 解码器已内置于 `vendor/` 目录，**无需联网、无需 npm 安装**。
+> 学院 GLB 通过 `fetch` 载入，因此请用静态服务器（方式二）而不是 `file://` 打开——否则地图上会退回简版空岛。
 > 建议桌面端 Chrome / Edge / Firefox 现代版本，带 WebGL 的显卡体验最佳。
 
 ## 目录结构
 
 ```
 aetheria-world/
-├── index.html            # 主页面（四大栏目：地图 / 星槎学院 / 世界观 / 图鉴）
-├── css/
-│   └── style.css         # 暗金奇幻风格样式
+├── index.html                 # 主页面（四大栏目：地图 / 星槎学院 / 世界观 / 图鉴）
+├── css/style.css              # 暗金奇幻风格样式（含学院 3D 舞台 / 志书卡片 / 船票）
 ├── js/
-│   ├── noise.js          # 确定性 value-noise / fBm / 山脊噪声
-│   ├── terrain.js        # 地形系统（三大陆掩膜 / 河流水力 / 湖泊 / 42 城选址；浏览器与 Node 通用）
-│   ├── data.js           # 世界观数据（势力 / 42 城 / 学院 / 地理志 / 纪元 / 魔法 / 神器）
-│   ├── world.js          # 3D 世界引擎（领地着色 / 分层城镇 / 空岛学院 / 裂隙 / 氛围）
-│   └── app.js            # 页面交互（标签页 / 卡片 / 学院 / 图鉴渲染）
-├── img/                  # 学院专题插图（AI 生成）
-├── vendor/
-│   ├── three.min.js      # Three.js r128（MIT）
-│   └── OrbitControls.js  # 轨道控制器（MIT）
+│   ├── noise.js               # 确定性 value-noise / fBm / 山脊噪声
+│   ├── terrain.js             # 地形系统（三大陆掩膜 / 河流水力 / 湖泊 / 42 城选址）
+│   ├── data.js                # 世界观数据（势力 / 42 城 / 学院志书 / 地理志 / 纪元 / 魔法 / 神器）
+│   ├── world.js               # 3D 世界引擎（领地着色 / 分层城镇 / 裂隙 / 氛围；载入学院 GLB）
+│   ├── academy3d.js           # 星槎学院独立观览器（天空 / 云海 / 光柱 / 热点 / 氛围 / 动画）
+│   └── app.js                 # 页面交互（标签页 / 卡片 / 学院志书与 3D 舞台 / 图鉴渲染）
+├── blender/academy/           # ★ Blender 程序化建模源码（Python，Blender 4.2）
+│   ├── build.py               # 入口：建模 → 合并 → 导出 GLB + 热点 JSON → 渲染
+│   ├── layout.py              # 总平面：所有建筑的位置 / 朝向 / 尺寸（与设定书一一对应）
+│   ├── island.py              # 倒锥岛体、地形高度场、岩柱、晶根、陪岛石、云
+│   ├── parts.py               # 建筑零件库：墙体砌缝、门窗、屋顶、栏杆、楼梯、柱廊、灯…
+│   ├── buildings_core.py      # 星陨塔 / 四柱 / 广场 / 回廊 / 星穗馆
+│   ├── buildings_houses.py    # 四院四塔 / 梧桐 / 栈桥与渡船 / 浮池云网
+│   ├── buildings_life.py      # 星潮厅 / 灶房梯田 / 宿舍 / 烬园钟楼 / 马圈 / 植被 / 人物
+│   └── util.py                # 网格工具、材质、顶点色、调色板
+├── models/
+│   ├── xingcha_academy.glb    # Draco 压缩 glTF（1.7 MB）
+│   ├── xingcha_academy.hotspots.json   # 22 处热点（名称 / 位置 / 相机机位）
+│   ├── xingcha_academy.blend  # Blender 源文件（合并前，可直接打开编辑）
+│   └── render_*.png           # Cycles 渲染成图（八个机位）
+├── docs/
+│   ├── 01-世界志.md            # 世界观设定书（大陆 / 势力 / 时局 / 名词）
+│   └── 02-星槎志.md            # 星槎学院设定书（建模与网页文案的唯一依据）
+├── img/                       # 学院插图与渲染图
+├── vendor/                    # Three.js r128 · OrbitControls · GLTFLoader · DRACOLoader · draco 解码器
 ├── LICENSE
 └── README.md
 ```
+
+## 重新生成模型
+
+```bash
+# 需要 Blender 4.2+（无界面运行）
+cd blender/academy
+blender -b --python build.py -- --out ../../models            # 建模 + 导出 GLB / 热点
+blender -b --python build.py -- --out ../../models --blend    # 另存 .blend
+blender -b --python build.py -- --out ../../models --render --quality high   # 加渲染八机位
+ACADEMY_VIEWS=hero_sw blender -b --python build.py -- --render --quality preview --no-export  # 只渲一个机位
+```
+
+建模约 4 s，合并 + Draco 导出约 40 s；渲染视机器而定（2 核 CPU 上每机位 1–4 分钟）。
 
 ## 技术说明
 
@@ -119,6 +155,9 @@ aetheria-world/
 | 氛围 | 天空 / 海面 / 雾 / 光照 / 星空 / 发光体由统一状态机插值切换 |
 | 渲染 | sRGB 输出 + ACES 色调映射 |
 | 确定性 | 全部噪声与摆放使用固定种子（`srand` 线性同余），每次打开布局一致 |
+| 学院建模 | Blender bmesh 程序化：砌缝墙体 / 参数化屋顶 / 螺旋梯 / 树冠簇；全部材质用**顶点色**（无 UV、无贴图），glTF 体积极小 |
+| 学院导出 | 按（集合 × 材质 × 动效类型）合并；可动件保留独立对象与 `extras`；Draco 量化（位置 14 bit / 法线 10 bit / 颜色 10 bit） |
+| 学院观览 | 单 Draw Call 天空（地平线 / 天顶 / 云海 fbm / 日晕）、加法混合光柱与粒子、`Raycaster` 遮挡剔除的 HTML 地名浮标、双 WebGL 场景按标签页互斥渲染 |
 
 ## 创作声明
 

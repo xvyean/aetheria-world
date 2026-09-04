@@ -92,19 +92,75 @@
     <!-- ===================== 星槎学院 ===================== -->
     <section id="tab-academy" class="tabpane lore-scroll">
       <div class="academy-wrap">
-        <div class="academy-hero frame">
-          <img class="academy-hero-img" src="img/academy-hero.jpg" alt="星槎空岛全景">
-          <div class="academy-hero-veil"></div>
-          <div class="academy-hero-body">
-            <div class="lore-orn">────── ✦ ──────</div>
-            <h1>星槎学院</h1>
-            <div class="academy-en">XINGCHA ACADEMY · 悬于星辉裂隙之上</div>
+
+        <!-- ——— 三维空岛（Blender 建模 → glTF/Draco） ——— -->
+        <div class="academy-stage frame" id="academy-stage">
+          <canvas id="academy-canvas" aria-label="星槎学院三维模型"></canvas>
+          <div id="academy-labels" class="academy-labels" aria-hidden="true"></div>
+
+          <div class="stage-head">
+            <div class="stage-title">
+              <div class="lore-orn">── ✦ ──</div>
+              <h1>星槎学院</h1>
+              <div class="academy-en">XINGCHA ACADEMY · 悬于星辉裂隙之上三百丈</div>
+            </div>
+            <div class="stage-hint" id="academy-hint">拖动旋转 · 滚轮缩放 · 点击建筑读志</div>
+          </div>
+
+          <div class="stage-loading" id="academy-loading">
+            <div class="stage-loading-ring"></div>
+            <div class="stage-loading-text">渡船正在靠岸<span id="academy-progress"></span></div>
+          </div>
+
+          <div class="stage-ctl">
+            <div class="stage-ctl-group" id="academy-presets">
+              <button class="preset-btn active" data-preset="dawn">晨</button>
+              <button class="preset-btn" data-preset="noon">午</button>
+              <button class="preset-btn" data-preset="night">夜</button>
+            </div>
+            <div class="stage-ctl-group">
+              <button class="ctl-btn" id="academy-home" title="回到全景">全景</button>
+              <button class="ctl-btn" id="academy-under" title="看岛底与塔根">岛底</button>
+              <button class="ctl-btn" id="academy-orbit" title="自动环绕">环绕</button>
+              <button class="ctl-btn" id="academy-labels-toggle" title="显示/隐藏地名">地名</button>
+              <button class="ctl-btn" id="academy-full" title="全屏">全屏</button>
+            </div>
+          </div>
+
+          <div class="stage-hover" id="academy-hover"></div>
+
+          <aside class="spot-card" id="spot-card">
+            <button class="spot-close" id="spot-close" aria-label="关闭">×</button>
+            <div class="spot-sub" id="spot-sub"></div>
+            <h3 id="spot-name"></h3>
+            <p id="spot-text"></p>
+            <div class="spot-nav">
+              <button class="ctl-btn" id="spot-prev">‹ 上一处</button>
+              <span id="spot-index"></span>
+              <button class="ctl-btn" id="spot-next">下一处 ›</button>
+            </div>
+          </aside>
+        </div>
+
+        <!-- 岛上地名索引 -->
+        <div class="spot-index-row" id="spot-list"></div>
+
+        <!-- ——— 船票 ——— -->
+        <div class="academy-ticket frame">
+          <div class="ticket-left">
+            <div class="ticket-punch"></div>
+            <div class="ticket-title">船 票</div>
+            <div class="ticket-front" id="ticket-front"></div>
+            <div class="ticket-back" id="ticket-back"></div>
+          </div>
+          <div class="ticket-right">
             <blockquote class="academy-motto" id="academy-motto"></blockquote>
             <div class="academy-stats">
               <div><span>创立</span><b id="academy-founded"></b></div>
               <div><span>升空</span><b id="academy-lifted"></b></div>
               <div><span>校长</span><b id="academy-head"></b></div>
               <div><span>入学</span><b id="academy-admit"></b></div>
+              <div><span>位置</span><b id="academy-location"></b></div>
             </div>
           </div>
         </div>
@@ -112,14 +168,22 @@
         <section class="academy-section frame">
           <div class="sec-head">
             <span class="sec-no"><i>壹</i></span>
-            <h2>八百年的来历</h2>
+            <h2>星槎不是船</h2>
+          </div>
+          <div id="academy-intro" class="academy-history"></div>
+        </section>
+
+        <section class="academy-section frame">
+          <div class="sec-head">
+            <span class="sec-no"><i>贰</i></span>
+            <h2>一千二百年的来历</h2>
           </div>
           <div id="academy-history" class="academy-history"></div>
         </section>
 
         <section class="academy-section frame">
           <div class="sec-head">
-            <span class="sec-no"><i>贰</i></span>
+            <span class="sec-no"><i>叁</i></span>
             <h2>四院</h2>
           </div>
           <p class="academy-note">台地升空那夜，四个学徒各抱着一根柱子没松手。那四根柱子，后来成了四院的院徽。分选的光落在哪一色上，学生就住在哪一色回廊的尽头。</p>
@@ -128,7 +192,7 @@
 
         <section class="academy-section frame">
           <div class="sec-head">
-            <span class="sec-no"><i>叁</i></span>
+            <span class="sec-no"><i>肆</i></span>
             <h2>分选礼</h2>
           </div>
           <div class="sorting-row">
@@ -136,13 +200,45 @@
             <div class="sorting-body">
               <h4>裂隙晶会问一个问题</h4>
               <p id="academy-sorting"></p>
+              <div class="sorting-records" id="sorting-records"></div>
             </div>
           </div>
         </section>
 
         <section class="academy-section frame">
           <div class="sec-head">
-            <span class="sec-no"><i>肆</i></span>
+            <span class="sec-no"><i>伍</i></span>
+            <h2>槎埠时刻 · 摆渡人</h2>
+          </div>
+          <div class="ferry-row">
+            <table class="ferry-table" id="ferry-table"></table>
+            <div class="ferry-body">
+              <p id="ferry-desc"></p>
+              <p id="ferry-man"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="academy-section frame">
+          <div class="sec-head">
+            <span class="sec-no"><i>陆</i></span>
+            <h2>星槎七律 · 十四贡</h2>
+          </div>
+          <div class="academy-grid">
+            <div class="academy-col">
+              <h4 class="academy-col-h">七律</h4>
+              <ol id="academy-laws" class="law-list"></ol>
+            </div>
+            <div class="academy-col">
+              <h4 class="academy-col-h">十四贡（束脩）</h4>
+              <div id="academy-tributes" class="tribute-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="academy-section frame">
+          <div class="sec-head">
+            <span class="sec-no"><i>柒</i></span>
             <h2>岛上的日子</h2>
           </div>
           <div class="academy-grid">
@@ -151,8 +247,8 @@
               <div id="academy-rituals"></div>
             </div>
             <div class="academy-col">
-              <h4 class="academy-col-h">建筑</h4>
-              <div id="academy-buildings"></div>
+              <h4 class="academy-col-h">建模札记</h4>
+              <div id="academy-making" class="academy-making"></div>
             </div>
           </div>
         </section>
@@ -269,10 +365,13 @@
 
 <script src="vendor/three.min.js"></script>
 <script src="vendor/OrbitControls.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="vendor/DRACOLoader.js"></script>
 <script src="js/noise.js"></script>
 <script src="js/terrain.js"></script>
 <script src="js/data.js"></script>
 <script src="js/world.js"></script>
+<script src="js/academy3d.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

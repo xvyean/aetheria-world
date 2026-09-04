@@ -925,7 +925,26 @@ button { font-family: inherit; }
 @media (max-width: 640px) {
   .hud-panel { display: none; }
   .hud-hint { font-size: 10.5px; padding: 6px 12px; white-space: normal; text-align: center; max-width: 86vw; }
-  .tab { padding: 8px 10px; font-size: 13px; letter-spacing: 0.06em; }
+  #topbar { padding: 0 12px; }
+  .brand { gap: 6px; }
+  .brand-name { white-space: nowrap; font-size: 20px; }
+  .brand-sub { display: none; }
+  .tabs { gap: 0; }
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; max-width: 68vw; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 8px 7px; font-size: 12.5px; letter-spacing: 0.02em; white-space: nowrap; flex: 0 0 auto; }
+  .brand-name { font-size: 18px; }
+  .academy-wrap { padding: 12px 10px 50px; }
+  .stage-title h1 { font-size: 22px; letter-spacing: 0.18em; }
+  .stage-title .academy-en { font-size: 9.5px; letter-spacing: 0.2em; }
+  .stage-ctl { left: 10px; right: 10px; bottom: 10px; gap: 6px; }
+  .stage-ctl .preset-btn, .stage-ctl .ctl-btn { padding: 6px 9px; font-size: 11.5px; letter-spacing: 0.06em; }
+  .spot-card { bottom: 58px; max-height: 46%; }
+  .spot-card h3 { font-size: 18px; }
+  .spot-card p { font-size: 12.5px; line-height: 1.8; }
+  .academy-section { padding: 22px 16px; }
+  .ticket-right { padding: 22px 18px; }
+  .ticket-left { padding: 22px 20px; }
   #city-card { width: calc(100vw - 36px); right: calc(-100vw + 36px); }
   #city-card.open { right: 18px; }
 }
@@ -945,65 +964,11 @@ button { font-family: inherit; }
 
 /* ===================== 星槎学院（专题页） ===================== */
 .academy-wrap {
-  max-width: 1020px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 44px 26px 70px;
+  padding: 30px 26px 70px;
 }
 
-.academy-hero {
-  position: relative;
-  margin: 0 0 30px;
-  min-height: 460px;
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-  padding: 0;
-  background: #0a0d1e;
-}
-.academy-hero-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.92;
-}
-.academy-hero-veil {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(8,10,24,0.12) 0%, rgba(8,10,24,0.34) 46%, rgba(8,10,24,0.94) 100%);
-}
-.academy-hero-body {
-  position: relative;
-  z-index: 2;
-  padding: 44px 48px 40px;
-  width: 100%;
-}
-.academy-hero-body h1 {
-  font-family: var(--serif);
-  font-size: 46px;
-  letter-spacing: 0.24em;
-  color: var(--ink);
-  margin: 6px 0 4px;
-  text-shadow: 0 0 30px rgba(217,180,91,0.35);
-}
-.academy-en {
-  font-size: 11.5px;
-  letter-spacing: 0.34em;
-  color: rgba(232,225,200,0.72);
-  margin-bottom: 18px;
-}
-.academy-motto {
-  margin: 0 0 22px;
-  font-family: var(--serif);
-  font-size: 17px;
-  line-height: 1.9;
-  color: var(--gold-bright);
-  letter-spacing: 0.06em;
-  border-left: 2px solid rgba(217,180,91,0.5);
-  padding-left: 14px;
-  max-width: 640px;
-}
 .academy-stats {
   display: flex;
   flex-wrap: wrap;
@@ -1193,4 +1158,218 @@ button { font-family: inherit; }
   .academy-hero-body { padding: 30px 24px 26px; }
   .academy-hero-body h1 { font-size: 34px; }
   .academy-section { padding: 26px 22px; }
+}
+
+/* ===================== 星槎学院 · 三维舞台 ===================== */
+
+.academy-stage {
+  position: relative;
+  height: min(76vh, 820px);
+  min-height: 520px;
+  margin: 0 0 14px;
+  padding: 0;
+  overflow: hidden;
+  background: #0a0d1e;
+  border-color: rgba(217, 180, 91, 0.3);
+  user-select: none;
+}
+.academy-stage:fullscreen { height: 100vh; min-height: 0; margin: 0; border: none; border-radius: 0; }
+#academy-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block; cursor: grab;
+  touch-action: none;
+}
+#academy-canvas:active { cursor: grabbing; }
+
+.stage-head {
+  position: absolute; left: 0; right: 0; top: 0;
+  padding: 22px 28px 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(8, 10, 24, 0.55), transparent);
+  z-index: 3;
+}
+.stage-title .lore-orn { text-align: left; margin: 0 0 4px; font-size: 11px; }
+.stage-title h1 {
+  font-family: var(--serif);
+  font-size: 34px; letter-spacing: 0.26em;
+  color: var(--ink); margin: 0 0 2px;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.7), 0 0 30px rgba(217, 180, 91, 0.35);
+}
+.stage-title .academy-en { margin: 0; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8); }
+.stage-hint {
+  font-size: 11px; letter-spacing: 0.2em; color: rgba(232, 225, 200, 0.6);
+  padding: 8px 12px; border: 1px solid rgba(217, 180, 91, 0.2); border-radius: 4px;
+  background: rgba(10, 13, 30, 0.45); backdrop-filter: blur(6px);
+  transition: opacity 1s; white-space: nowrap;
+}
+.stage-hint.fade { opacity: 0; }
+
+.stage-loading {
+  position: absolute; inset: 0; z-index: 6;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  background: radial-gradient(60% 60% at 50% 50%, rgba(20, 26, 60, 0.9), rgba(8, 10, 24, 0.98));
+  transition: opacity 0.9s;
+}
+.stage-loading.done { opacity: 0; pointer-events: none; }
+.stage-loading-ring {
+  width: 54px; height: 54px; border-radius: 50%;
+  border: 1px solid rgba(217, 180, 91, 0.25); border-top-color: var(--gold-bright);
+  animation: spin 1.4s linear infinite;
+  box-shadow: 0 0 24px rgba(217, 180, 91, 0.2), inset 0 0 18px rgba(127, 232, 255, 0.12);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.stage-loading-text { font-family: var(--serif); letter-spacing: 0.3em; font-size: 13px; color: rgba(232, 225, 200, 0.75); }
+.stage-loading-text span { margin-left: 8px; color: var(--gold); letter-spacing: 0.05em; }
+
+.stage-ctl {
+  position: absolute; left: 18px; bottom: 18px; z-index: 4;
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.stage-ctl-group {
+  display: flex; gap: 2px; padding: 4px;
+  background: rgba(12, 15, 32, 0.7); border: 1px solid rgba(217, 180, 91, 0.22);
+  border-radius: 9px; backdrop-filter: blur(8px);
+}
+.stage-ctl .preset-btn, .stage-ctl .ctl-btn { padding: 6px 12px; font-size: 12px; }
+
+.stage-hover {
+  position: absolute; z-index: 5; pointer-events: none;
+  padding: 5px 10px; border-radius: 4px;
+  background: rgba(10, 13, 30, 0.85); border: 1px solid rgba(217, 180, 91, 0.45);
+  color: var(--gold-bright); font-family: var(--serif); font-size: 12.5px; letter-spacing: 0.14em;
+  transform: translate(-50%, -140%); opacity: 0; transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.stage-hover.on { opacity: 1; }
+
+/* 地名浮标 */
+.academy-labels { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.academy-labels.hidden { display: none; }
+.alabel {
+  position: absolute; left: 0; top: 0;
+  transform: translate(-50%, -100%);
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; transition: opacity 0.35s;
+  will-change: transform;
+}
+.alabel.vis { opacity: 1; }
+.alabel span {
+  font-family: var(--serif); font-size: 11.5px; letter-spacing: 0.16em; white-space: nowrap;
+  color: rgba(240, 232, 208, 0.92);
+  text-shadow: 0 1px 2px #000, 0 0 10px rgba(0, 0, 0, 0.9), 0 0 2px #000;
+  padding-bottom: 3px;
+}
+.alabel i {
+  display: block; width: 1px; height: 14px;
+  background: linear-gradient(180deg, rgba(217, 180, 91, 0.9), transparent);
+}
+.alabel.far span { font-size: 10px; opacity: 0.7; }
+.alabel.hot span { color: var(--gold-bright); }
+
+/* 志书卡片 */
+.spot-card {
+  position: absolute; right: 18px; top: 84px; z-index: 5;
+  width: 320px; max-width: calc(100% - 36px); max-height: calc(100% - 160px);
+  overflow-y: auto;
+  padding: 22px 24px 18px;
+  background: linear-gradient(165deg, rgba(20, 24, 50, 0.9), rgba(10, 12, 26, 0.94));
+  border: 1px solid rgba(217, 180, 91, 0.4); border-radius: 4px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  transform: translateX(24px); opacity: 0; pointer-events: none;
+  transition: transform 0.4s cubic-bezier(.2,.8,.2,1), opacity 0.35s;
+}
+.spot-card.open { transform: none; opacity: 1; pointer-events: auto; }
+.spot-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold-dim));
+}
+.spot-close {
+  position: absolute; right: 10px; top: 8px;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid rgba(217, 180, 91, 0.3); background: transparent; color: var(--muted);
+  font-size: 16px; line-height: 1; cursor: pointer;
+}
+.spot-close:hover { color: var(--gold-bright); border-color: var(--gold); }
+.spot-sub { font-size: 10.5px; letter-spacing: 0.22em; color: var(--gold); margin-bottom: 6px; }
+.spot-card h3 { font-family: var(--serif); font-size: 21px; letter-spacing: 0.14em; color: var(--ink); margin: 0 0 12px; }
+.spot-card p { font-size: 13px; line-height: 1.95; color: #cfc8b6; margin: 0 0 14px; text-align: justify; }
+.spot-nav { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(217, 180, 91, 0.16); padding-top: 10px; }
+.spot-nav span { font-size: 11px; letter-spacing: 0.2em; color: var(--muted); }
+
+/* 地名索引条 */
+.spot-index-row {
+  display: flex; flex-wrap: wrap; gap: 6px 4px;
+  margin: 0 0 30px; padding: 0 4px;
+}
+.spot-index-row button {
+  padding: 5px 11px; border-radius: 3px;
+  border: 1px solid rgba(217, 180, 91, 0.16); background: rgba(255, 255, 255, 0.025);
+  color: #b8b19e; font-family: var(--serif); font-size: 12px; letter-spacing: 0.12em; cursor: pointer;
+  transition: all 0.2s;
+}
+.spot-index-row button:hover, .spot-index-row button.active { color: var(--gold-bright); border-color: rgba(217, 180, 91, 0.5); background: rgba(217, 180, 91, 0.08); }
+
+/* 船票 */
+.academy-ticket {
+  display: grid; grid-template-columns: 300px 1fr; gap: 0;
+  padding: 0; overflow: hidden; margin-bottom: 30px;
+}
+.ticket-left {
+  position: relative; padding: 30px 28px 30px 34px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 22px, rgba(60, 50, 30, 0.06) 22px 23px),
+    linear-gradient(160deg, #e6dcc0, #cdbf9a);
+  color: #3a2e1c;
+  border-right: 2px dashed rgba(217, 180, 91, 0.45);
+}
+.ticket-punch { position: absolute; left: 12px; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: #0c0f1e; transform: translateY(-50%); box-shadow: 0 -120px 0 #0c0f1e, 0 120px 0 #0c0f1e; }
+.ticket-title { font-family: var(--serif); font-size: 22px; letter-spacing: 0.6em; color: #6a4a1a; border-bottom: 1px solid rgba(80, 60, 20, 0.3); padding-bottom: 8px; margin-bottom: 14px; }
+.ticket-front { font-family: var(--serif); font-size: 13px; line-height: 2.1; letter-spacing: 0.12em; white-space: pre-line; color: #3a2e1c; }
+.ticket-back { margin-top: 16px; font-family: var(--serif); font-size: 12.5px; color: #7a2e1c; letter-spacing: 0.1em; font-style: italic; border-top: 1px dotted rgba(80, 60, 20, 0.35); padding-top: 10px; }
+.ticket-right { padding: 34px 40px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+.ticket-right .academy-motto { margin: 0; }
+.ticket-right .academy-stats { gap: 12px 30px; }
+
+/* 分选记录 / 渡船 / 七律 / 十四贡 / 建模札记 */
+.sorting-records { margin-top: 16px; border-top: 1px solid rgba(217, 180, 91, 0.16); padding-top: 12px; }
+.sorting-records div { font-size: 12.5px; line-height: 1.9; color: #b9b3a2; margin-bottom: 8px; }
+.sorting-records b { display: block; font-family: var(--serif); font-size: 12px; letter-spacing: 0.2em; color: var(--gold); font-weight: 500; }
+
+.ferry-row { display: grid; grid-template-columns: 300px 1fr; gap: 30px; align-items: start; }
+.ferry-table { width: 100%; border-collapse: collapse; font-family: var(--serif); }
+.ferry-table td { padding: 10px 8px; border-bottom: 1px solid rgba(217, 180, 91, 0.14); font-size: 13px; line-height: 1.7; color: #c9c2b0; vertical-align: top; }
+.ferry-table td:first-child { color: var(--gold-bright); letter-spacing: 0.2em; white-space: nowrap; width: 64px; }
+.ferry-body p { font-size: 14px; line-height: 2; color: #cfc8b6; text-align: justify; margin: 0 0 14px; }
+
+.law-list { margin: 0; padding-left: 0; list-style: none; counter-reset: law; }
+.law-list li { position: relative; padding: 0 0 12px 40px; margin-bottom: 10px; border-bottom: 1px solid rgba(217, 180, 91, 0.1); counter-increment: law; }
+.law-list li::before { content: counter(law, cjk-ideographic); position: absolute; left: 0; top: 2px; font-family: var(--serif); color: var(--gold); font-size: 15px; }
+.law-list b { display: block; font-family: var(--serif); font-size: 15px; color: var(--ink); letter-spacing: 0.1em; margin-bottom: 4px; font-weight: 500; }
+.law-list span { font-size: 12.5px; line-height: 1.85; color: #aca597; }
+
+.tribute-list { display: grid; grid-template-columns: 1fr; gap: 0; }
+.tribute-list div { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(217, 180, 91, 0.1); font-size: 12.5px; line-height: 1.75; color: #b9b3a2; }
+.tribute-list b { font-family: var(--serif); color: #e2d9bd; font-weight: 500; letter-spacing: 0.08em; }
+
+.academy-making p { font-size: 12.5px; line-height: 1.9; color: #aca597; margin: 0 0 10px; }
+.academy-making b { color: #d8cfb3; font-weight: 500; }
+.academy-making code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; color: var(--cyan); background: rgba(127, 232, 255, 0.06); padding: 1px 5px; border-radius: 3px; }
+
+.house-tower { font-size: 11.5px; color: var(--muted); margin: 6px 0 0; line-height: 1.7; }
+.house-head-line { font-size: 12px; line-height: 1.8; color: #b9b3a2; margin: 10px 0 0; border-left: 2px solid var(--hc, var(--gold)); padding-left: 10px; }
+.house-rules { margin: 10px 0 0; padding: 0; list-style: none; }
+.house-rules li { font-size: 11.5px; line-height: 1.7; color: #a29b8b; padding-left: 12px; position: relative; }
+.house-rules li::before { content: '·'; position: absolute; left: 0; color: var(--hc, var(--gold)); }
+
+@media (max-width: 860px) {
+  .academy-stage { height: 70vh; min-height: 440px; }
+  .stage-title h1 { font-size: 26px; }
+  .stage-hint { display: none; }
+  .spot-card { right: 10px; left: 10px; top: auto; bottom: 70px; width: auto; max-height: 46%; padding: 16px 18px 12px; }
+  .academy-ticket, .ferry-row { grid-template-columns: 1fr; }
+  .ticket-left { border-right: none; border-bottom: 2px dashed rgba(217, 180, 91, 0.45); }
+  .ticket-punch { display: none; }
 }

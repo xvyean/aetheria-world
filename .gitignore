@@ -2,3 +2,5 @@
 Thumbs.db
 *.log
 node_modules/
+*.blend1
+__pycache__/
