@@ -14,7 +14,7 @@ v1 original (f92382c)
    └─ v3 three continents (1e34911)
       ├─ v4 afterglow (b43fde1)
       │  └─ version/v4-modern-bible（v4 综合版快照）
-      │      └─ main ── v5 综合版（当前：设定圣经 v5 + Blender 分区管线 + 学院手册页 + 世界舆图页）
+      │      └─ main / version/v5-refactor（当前：设定圣经 v5 + Blender 分区管线 + 学院手册页 + 世界舆图页）
       └─ v4 blender academy (7ac41da)
 ```
 
@@ -26,7 +26,7 @@ v1 original (f92382c)
 - 想要《余光未尽》设定：`version/v4-afterglow`
 - 想要完整的 Blender 4.2 程序化学院和 Draco 模型：`version/v4-blender-academy`
 - 想同时保留大陆页与现代学院页：`version/v4-modern-bible`（v5 之前的 main 状态）
-- 想要当前 v5 综合版（设计宪法 + 九卷圣经、Blender 分区管线、`academy.html` 学院手册、`world-modern.html` 世界舆图）：`main`
+- 想要当前 v5 综合版（设计宪法 + 九卷圣经、Blender 分区管线、`academy.html` 学院手册、`world-modern.html` 世界舆图）：`main` 或 `version/v5-refactor`
 
 ## 恢复与比较
 

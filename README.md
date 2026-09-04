@@ -39,7 +39,8 @@
 | [`version/v3-three-continents`](https://github.com/xvyean/aetheria-world/tree/version/v3-three-continents) | 三块大陆、四十二城、初版星槎学院 | `1e34911` |
 | [`version/v4-afterglow`](https://github.com/xvyean/aetheria-world/tree/version/v4-afterglow) | 《余光未尽》设定与船岛 GLB | `b43fde1` |
 | [`version/v4-blender-academy`](https://github.com/xvyean/aetheria-world/tree/version/v4-blender-academy) | 独立 Blender 4.2 / Draco 学院方案 | `7ac41da` |
-| [`version/v4-modern-bible`](https://github.com/xvyean/aetheria-world/tree/version/v4-modern-bible) | v4 综合版快照（v5 之前的 main 状态） | `7ba3531` |
+| [`version/v4-modern-bible`](https://github.com/xvyean/aetheria-world/tree/version/v4-modern-bible) | v4 综合版快照，含现代学院页的完整依赖 | `368b811` |
+| [`version/v5-refactor`](https://github.com/xvyean/aetheria-world/tree/version/v5-refactor) | 当前 v5：九卷圣经、分区建模管线、学院手册与世界舆图 | 该分支最新提交 |
 
 完整的分支来源、选择建议与恢复方法见 [`VERSIONING.md`](VERSIONING.md)；给 AI 贡献者的仓库守则见 [`AGENTS.md`](AGENTS.md)——不直接在主分支开新方向、不提交冲突标记、提交前跑冲突检查与 `node --check`。
 
@@ -138,7 +139,7 @@ aetheria-world/
 
 写设定 / 建模前必查（详见 `bible/06` 第二节与 `docs/DESIGN.md`）：
 
-1. 出现“星辉历” → 改“星辉历”。
+1. 出现“余光历” → 改“星辉历”。
 2. 学院出现紫色（海心花圃除外） → 改。
 3. 建筑数 ≠《建筑志 v2》 → 改。
 4. 分选礼 ≠ 试读年次年春分夜 → 改。
