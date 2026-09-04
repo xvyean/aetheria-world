@@ -1,0 +1,145 @@
+/* ============================================================
+ * 艾瑟兰 · 现代重构版样式（world-modern.html）
+ * ============================================================ */
+:root {
+  --ink: #e8e4d8;
+  --ink-dim: #b8b4a8;
+  --line: rgba(232, 228, 216, 0.14);
+  --bg: #0c1424;
+  --bg2: #101c30;
+  --gold: #e8b45b;
+  --gold-dim: #d9b45b;
+  --cyan: #7fe8ff;
+  --sky: #8fb2ff;
+  --purple: #8a4fd0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--ink); font-family: "Noto Serif SC", "Songti SC", serif; }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(127, 232, 255, 0.08), transparent 45%),
+    radial-gradient(ellipse at 80% 100%, rgba(232, 180, 91, 0.07), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(30, 48, 92, 0.35), transparent 70%);
+}
+#app { position: relative; z-index: 1; }
+
+/* ---------- 顶栏 ---------- */
+#topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 30px; gap: 20px;
+  background: linear-gradient(180deg, rgba(12, 20, 36, 0.92), rgba(12, 20, 36, 0.72));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; gap: 12px; }
+.brand-star { color: var(--gold); font-size: 1.4em; animation: twinkle 3s ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:1} 50%{opacity:0.55} }
+.brand-name { font-size: 1.5em; letter-spacing: 0.3em; color: var(--ink); }
+.brand-sub { font-size: 0.78em; color: var(--ink-dim); letter-spacing: 0.15em; }
+.tabs { display: flex; gap: 8px; }
+.tab {
+  background: transparent; border: 1px solid var(--line); color: var(--ink-dim);
+  padding: 8px 20px; font-size: 0.95em; letter-spacing: 0.1em; cursor: pointer;
+  font-family: inherit; border-radius: 3px; transition: all 0.25s;
+}
+.tab:hover { color: var(--ink); border-color: var(--gold-dim); }
+.tab.active { color: #14100a; background: var(--gold); border-color: var(--gold); }
+.badge { font-size: 0.68em; background: var(--cyan); color: #06222e; border-radius: 3px; padding: 1px 5px; margin-left: 5px; vertical-align: middle; }
+
+/* ---------- 布局 ---------- */
+main { position: relative; z-index: 1; }
+.tabpane { display: none; animation: fade 0.5s ease; }
+.tabpane.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+.academy-wrap { max-width: 1180px; margin: 0 auto; padding: 30px 22px 80px; display: grid; gap: 26px; }
+.frame {
+  background: linear-gradient(180deg, rgba(20, 30, 52, 0.75), rgba(13, 21, 38, 0.85));
+  border: 1px solid var(--line); border-radius: 8px; padding: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+h1 { font-size: 2.6em; letter-spacing: 0.2em; color: var(--ink); margin-top: 18px; }
+h4 { font-size: 1.25em; letter-spacing: 0.18em; color: var(--gold); border-left: 3px solid var(--gold); padding-left: 12px; margin-bottom: 16px; }
+.academy-en { color: var(--ink-dim); letter-spacing: 0.25em; font-size: 0.9em; margin-top: 6px; }
+.academy-motto { color: var(--cyan); font-size: 1.15em; font-style: italic; margin: 14px 0; line-height: 1.7; }
+.academy-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }
+.academy-stats > div { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 5px; padding: 12px; }
+.academy-stats span { display: block; font-size: 0.75em; color: var(--ink-dim); letter-spacing: 0.2em; margin-bottom: 6px; }
+.academy-stats b { color: var(--ink); font-size: 1.05em; }
+
+/* 查看器 */
+#viewer-box { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: radial-gradient(ellipse at 50% 30%, #18294a, #0a1222); }
+#viewer-canvas { display: block; width: 100%; cursor: grab; }
+#viewer-canvas:active { cursor: grabbing; }
+.viewer-hud { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; padding: 14px 18px; font-size: 0.8em; color: var(--ink-dim); letter-spacing: 0.1em; background: linear-gradient(transparent, rgba(6,10,20,0.8)); }
+.v-title { color: var(--cyan); }
+
+/* 学院文本 */
+.academy-history p { line-height: 1.9; margin-bottom: 14px; color: var(--ink); }
+.dropcap::first-letter { float: left; font-size: 3.2em; line-height: 0.85; padding: 4px 8px 0 0; color: var(--gold); font-family: serif; }
+.academy-note { color: var(--ink-dim); font-style: italic; margin-bottom: 18px; line-height: 1.7; }
+.academy-sorting { line-height: 1.9; }
+.academy-sorting .dropcap { float: left; font-size: 2.6em; line-height: 0.9; padding: 2px 8px 0 0; color: var(--gold); }
+
+.house-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.house-card { border: 1px solid var(--line); border-left: 3px solid var(--hc); border-radius: 6px; padding: 18px; background: rgba(255,255,255,0.03); }
+.house-emblem { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; border: 1px solid var(--hc); margin-bottom: 12px; background: #0d1524; }
+.house-emblem img { width: 100%; height: 100%; object-fit: cover; }
+.house-head h3 { color: var(--hc); letter-spacing: 0.15em; }
+.house-motto { font-style: italic; color: var(--ink-dim); margin: 4px 0 10px; font-size: 0.92em; }
+.house-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.house-tags span { font-size: 0.72em; border: 1px solid var(--line); border-radius: 20px; padding: 3px 10px; color: var(--ink-dim); }
+.house-desc { font-size: 0.92em; line-height: 1.75; margin-bottom: 14px; }
+.house-foot { display: flex; gap: 16px; font-size: 0.8em; color: var(--ink-dim); border-top: 1px dashed var(--line); padding-top: 10px; }
+.house-foot b { display: block; color: var(--gold-dim); margin-bottom: 3px; font-weight: normal; letter-spacing: 0.1em; }
+
+/* 列表 */
+.academy-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.academy-list { display: grid; gap: 10px; }
+.academy-item { border: 1px solid var(--line); border-radius: 5px; padding: 12px 15px; background: rgba(255,255,255,0.025); }
+.academy-item h5 { color: var(--gold-dim); letter-spacing: 0.1em; margin-bottom: 6px; font-size: 1em; }
+.academy-item p { font-size: 0.9em; line-height: 1.7; color: var(--ink-dim); }
+.mystery { border-left: 3px solid var(--purple); }
+#rules-list ol { padding-left: 24px; display: grid; gap: 8px; }
+#rules-list li { line-height: 1.7; color: var(--ink); font-size: 0.95em; }
+
+.people-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.people-card { border: 1px solid var(--line); border-radius: 5px; padding: 12px 14px; background: rgba(255,255,255,0.025); }
+.people-card b { color: var(--gold-dim); display: block; }
+.people-card span { font-size: 0.75em; color: var(--ink-dim); letter-spacing: 0.15em; display: block; margin: 3px 0 8px; }
+.people-card p { font-size: 0.85em; line-height: 1.65; color: var(--ink-dim); }
+
+/* 世界观 / 圣经 / 资产 */
+.lore-scroll .frame h2 { color: var(--gold); letter-spacing: 0.25em; margin-bottom: 8px; }
+.lore-source { color: var(--ink-dim); font-size: 0.85em; margin-bottom: 12px; }
+.lore-year { color: var(--cyan); letter-spacing: 0.2em; margin-top: 10px; }
+.mini-card { border: 1px solid var(--line); border-left: 3px solid var(--sc, var(--gold-dim)); border-radius: 5px; padding: 12px 14px; background: rgba(255,255,255,0.025); }
+.mini-card b { display: block; color: var(--ink); margin-bottom: 3px; }
+.mini-card span { font-size: 0.72em; color: var(--ink-dim); letter-spacing: 0.1em; display: block; margin-bottom: 6px; }
+.mini-card p { font-size: 0.88em; line-height: 1.65; color: var(--ink-dim); }
+#school-grid, #artifact-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.chronicle-row { display: flex; gap: 18px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+.chronicle-row .era { min-width: 110px; color: var(--gold-dim); letter-spacing: 0.1em; font-size: 0.9em; }
+.chronicle-row i { color: var(--cyan); font-size: 0.78em; margin-left: 10px; font-style: normal; }
+.chronicle-row p { font-size: 0.9em; color: var(--ink-dim); line-height: 1.65; margin-top: 5px; }
+.glossary { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 28px; }
+.g-row { display: flex; gap: 10px; border-bottom: 1px dashed var(--line); padding: 8px 0; }
+.g-row b { min-width: 130px; color: var(--gold-dim); font-weight: normal; font-size: 0.92em; }
+.g-row span { color: var(--ink-dim); font-size: 0.88em; line-height: 1.6; }
+#geo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+.bible-vol { display: flex; gap: 20px; border-bottom: 1px dashed var(--line); padding: 16px 0; }
+.bv-no { font-size: 2.4em; color: var(--gold-dim); opacity: 0.5; min-width: 70px; font-family: serif; }
+.bv-body code { color: var(--cyan); font-size: 0.76em; opacity: 0.8; display: block; margin: 4px 0 8px; }
+.bv-body p { color: var(--ink-dim); line-height: 1.7; font-size: 0.94em; }
+.bv-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.bv-tags span { font-size: 0.74em; border: 1px solid var(--line); border-radius: 20px; padding: 2px 10px; color: var(--ink-dim); }
+.asset { margin-bottom: 10px; }
+
+@media (max-width: 900px) {
+  .house-grid, .academy-cols, #school-grid, .people-grid, .glossary, #geo-grid { grid-template-columns: 1fr; }
+  .academy-stats { grid-template-columns: repeat(2, 1fr); }
+  #topbar { flex-direction: column; align-items: flex-start; padding: 12px 16px; }
+  .tabs { flex-wrap: wrap; }
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>艾瑟兰 · Aetheria World — 星槎学院（精细三维）</title>
+<meta name="description" content="艾瑟兰世界重构版：星槎学院 Blender 精细化三维资产 + 全套世界观设定。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e8b84a' d='M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.4-6.3 4.4L8 13.8 2 9.2h7.6z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/world-modern.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-star">✦</span>
+      <span class="brand-name">艾瑟兰</span>
+      <span class="brand-sub">AETHERIA · 星槎学院精细版</span>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="academy">星槎学院 <span class="badge">3D</span></button>
+      <button class="tab" data-tab="lore">世界观</button>
+      <button class="tab" data-tab="bible">设定圣经</button>
+      <button class="tab" data-tab="assets">资产</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ============ 星槎学院 3D ============ -->
+    <section id="tab-academy" class="tabpane active">
+      <div class="academy-wrap">
+        <div class="academy-hero frame">
+          <div id="viewer-box">
+            <canvas id="viewer-canvas"></canvas>
+            <div class="viewer-hud">
+              <span class="v-hint">拖拽旋转 · 滚轮缩放 · 双击复位</span>
+              <span class="v-title">星槎空岛 · 悬于星辉裂隙之上</span>
+            </div>
+          </div>
+          <h1>星槎学院</h1>
+          <div class="academy-en">XINGCHA ACADEMY · 悬于星辉裂隙之上</div>
+          <blockquote class="academy-motto" id="academy-motto"></blockquote>
+          <div class="academy-stats">
+            <div><span>创立</span><b id="academy-founded"></b></div>
+            <div><span>升空</span><b id="academy-lifted"></b></div>
+            <div><span>校长</span><b id="academy-head"></b></div>
+            <div><span>入学</span><b id="academy-admit"></b></div>
+          </div>
+        </div>
+
+        <section class="academy-section frame">
+          <h4>沿革 · 八百年的账</h4>
+          <div id="academy-history" class="academy-history"></div>
+        </section>
+
+        <section class="academy-section frame">
+          <h4>四院 · 四种脾气</h4>
+          <p class="academy-note">升岛那夜，四个学徒各抱着一根柱子没松手。那四根柱子，后来成了四院的院徽。</p>
+          <div id="house-grid" class="house-grid"></div>
+        </section>
+
+        <section class="academy-section frame">
+          <h4>分选礼 · 裂隙晶的问题</h4>
+          <p id="academy-sorting" class="academy-sorting"></p>
+        </section>
+
+        <section class="academy-section frame">
+          <h4>岛规十三条 · 山门石刻</h4>
+          <div id="rules-list" class="academy-list"></div>
+        </section>
+
+        <section class="academy-section frame academy-cols">
+          <div>
+            <h4>仪典</h4>
+            <div id="academy-rituals" class="academy-list"></div>
+          </div>
+          <div>
+            <h4>建筑</h4>
+            <div id="academy-buildings" class="academy-list"></div>
+          </div>
+        </section>
+
+        <section class="academy-section frame">
+          <h4>人物 · 这一刻的第一抹剪影</h4>
+          <div id="people-list" class="people-grid"></div>
+        </section>
+
+        <section class="academy-section frame">
+          <h4>飞升之卷 · 十个谜</h4>
+          <div id="mysteries-list" class="academy-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============ 世界观 ============ -->
+    <section id="tab-lore" class="tabpane lore-scroll">
+      <div class="academy-wrap">
+        <div class="academy-section frame">
+          <h2 id="lore-name">艾瑟兰</h2>
+          <div class="academy-en" id="lore-en"></div>
+          <blockquote id="lore-epigraph"></blockquote>
+          <div id="lore-epigraph-source" class="lore-source"></div>
+          <p class="lore-year" id="lore-year"></p>
+        </div>
+        <section class="academy-section frame"><h4>魔法六派</h4><div id="school-grid"></div></section>
+        <section class="academy-section frame"><h4>纪元</h4><div id="chronicle-list"></div></section>
+        <section class="academy-section frame"><h4>神器</h4><div id="artifact-list"></div></section>
+        <section class="academy-section frame"><h4>名词典</h4><div id="glossary-table"></div></section>
+        <section class="academy-section frame"><h4>地理志</h4><div id="geo-grid"></div></section>
+      </div>
+    </section>
+
+    <!-- ============ 设定圣经 ============ -->
+    <section id="tab-bible" class="tabpane lore-scroll">
+      <div class="academy-wrap">
+        <div class="academy-section frame">
+          <h2>设定圣经 · 七卷</h2>
+          <p class="academy-note">本重构版世界观的唯一权威来源。卷宗写在 <code>bible/</code> 目录，网页展示为摘要。</p>
+          <div id="bible-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 资产 ============ -->
+    <section id="tab-assets" class="tabpane lore-scroll">
+      <div class="academy-wrap">
+        <div class="academy-section frame">
+          <h2>资产与管线</h2>
+          <p class="academy-note">从设定蓝图到三维资产的一体化管线。</p>
+          <div id="asset-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/academy.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="js/viewer.js"></script>
+</body>
+</html>
