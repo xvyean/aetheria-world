@@ -151,10 +151,12 @@
       document.getElementById('cc-pop').textContent = ACADEMY.location;
       document.getElementById('cc-ruler').textContent = ACADEMY.head;
       document.getElementById('cc-lore').textContent =
-        ACADEMY.motto + ' 创立：' + ACADEMY.founded + '。' + ACADEMY.admission + '。点击下方「星槎学院」标签，看四院与分选礼的完整记录。';
+        ACADEMY.motto + ' 创立：' + ACADEMY.founded + '。' + ACADEMY.admission;
+      document.getElementById('cc-goto').style.display = '';
       card.classList.add('open');
       return;
     }
+    document.getElementById('cc-goto').style.display = 'none';
     var f = factionById(city.faction);
     var rc = RACES[f.race] || { name: '星辉' };
     var tierName = city.tier === 'city' ? '大城' : (city.tier === 'town' ? '镇' : (city.tier === 'village' ? '村' : '首都'));
@@ -168,6 +170,7 @@
     card.classList.add('open');
   }
   function closeCard() { if (card) card.classList.remove('open'); }
+  document.getElementById('cc-goto').addEventListener('click', function () { closeCard(); switchTab('academy'); });
 
   World.onPick(function (city) {
     if (city) openCard(city); else closeCard();

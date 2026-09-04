@@ -1373,3 +1373,6 @@ button { font-family: inherit; }
   .ticket-left { border-right: none; border-bottom: 2px dashed rgba(217, 180, 91, 0.45); }
   .ticket-punch { display: none; }
 }
+
+.cc-goto { display: block; width: 100%; margin-top: 14px; padding: 10px 12px; text-align: center; color: var(--gold-bright); border-color: rgba(217, 180, 91, 0.4); background: rgba(217, 180, 91, 0.1); }
+.cc-goto:hover { background: rgba(217, 180, 91, 0.2); }
