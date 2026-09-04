@@ -1,15 +1,12 @@
 __pycache__/
 *.pyc
 *.blend1
+*.blend2
 .DS_Store
-<<<<<<< HEAD
 Thumbs.db
 *.log
 node_modules/
-*.blend1
-*.blend2
 .arena/
 
+# Local release archives
 aetheria-world.tar.gz
-=======
->>>>>>> d751044 (重构：星槎学院精细化三维重建 + 设定圣经 + 现代网页)
