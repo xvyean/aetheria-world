@@ -19,9 +19,30 @@ var AcademyView = (function () {
 
   function C(h) { return new THREE.Color(h); }
 
+  var CLICK_KEYS = [
+    'gate_dawn', 'gate_speak', 'gate_forge', 'gate_tide',
+    'cloister_dawn', 'cloister_speak', 'cloister_forge', 'cloister_tide',
+    'library', 'tower', 'observatory', 'pool', 'plaza', 'dorms', 'dorm',
+    'forge', 'boat', 'dock', 'ladder',
+    'Click_Tower', 'Click_Dawn', 'Click_Speak', 'Click_Forge', 'Click_Tide',
+    'Click_Library', 'Click_Pool', 'Click_Yard', 'Click_Prow', 'Click_Dorms'
+  ];
+  var CLICK_ALIAS = {
+    cloister_dawn: 'gate_dawn', cloister_speak: 'gate_speak',
+    cloister_forge: 'gate_forge', cloister_tide: 'gate_tide',
+    dorm: 'dorms', dock: 'boat',
+    Click_Tower: 'tower', Click_Dawn: 'gate_dawn', Click_Speak: 'gate_speak',
+    Click_Forge: 'gate_forge', Click_Tide: 'gate_tide', Click_Library: 'library',
+    Click_Pool: 'pool', Click_Yard: 'plaza', Click_Prow: 'boat', Click_Dorms: 'dorms'
+  };
+
   function findClick(obj) {
     while (obj) {
-      if (obj.name && obj.name.indexOf('Click_') === 0) return obj.name;
+      var n = (obj.name || '').split('.')[0];
+      for (var i = 0; i < CLICK_KEYS.length; i++) {
+        var k = CLICK_KEYS[i];
+        if (n === k || n.indexOf(k) === 0) return CLICK_ALIAS[k] || k;
+      }
       obj = obj.parent;
     }
     return null;
@@ -47,45 +68,38 @@ var AcademyView = (function () {
   }
 
   function lights() {
-    hemi = new THREE.HemisphereLight(0xc9d6e8, 0x3a3228, 0.55);
+    hemi = new THREE.HemisphereLight(0x3a4a6a, 0x1a1520, 0.7);
     scene.add(hemi);
-    key = new THREE.DirectionalLight(0xffe1b0, 1.15);
-    key.position.set(60, 80, 40);
-    key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
-    key.shadow.camera.left = -70;
-    key.shadow.camera.right = 70;
-    key.shadow.camera.top = 70;
-    key.shadow.camera.bottom = -70;
-    key.shadow.bias = -0.0003;
+    key = new THREE.DirectionalLight(0x8fa8d8, 1.05);
+    key.position.set(-280, 420, -160);
     scene.add(key);
-    fill = new THREE.DirectionalLight(0x7eb8d8, 0.35);
-    fill.position.set(-50, 30, -20);
+    fill = new THREE.PointLight(0xffb45e, 2.0, 520);
+    fill.position.set(0, 250, 0);
     scene.add(fill);
-    rim = new THREE.PointLight(0x7fe8ff, 1.4, 160);
-    rim.position.set(0, 48, 0);
+    rim = new THREE.PointLight(0x4fc0ff, 1.8, 900);
+    rim.position.set(0, 40, 0);
     scene.add(rim);
   }
 
   function buildStage() {
-    var g = new THREE.CircleGeometry(220, 48);
+    var g = new THREE.CircleGeometry(2200, 48);
     g.rotateX(-Math.PI / 2);
     var sea = new THREE.Mesh(g, new THREE.MeshStandardMaterial({
-      color: C(0x0d3a52), roughness: 0.35, metalness: 0.05,
-      emissive: C(0x042030), emissiveIntensity: 0.25
+      color: C(0x071828), roughness: 0.4, metalness: 0.05,
+      emissive: C(0x031018), emissiveIntensity: 0.4
     }));
-    sea.position.y = -36;
+    sea.position.y = -8;
     sea.receiveShadow = true;
     scene.add(sea);
 
     var beam = new THREE.Mesh(
-      new THREE.CylinderGeometry(2.2, 5.5, 90, 16, 1, true),
+      new THREE.CylinderGeometry(8, 22, 280, 16, 1, true),
       new THREE.MeshBasicMaterial({
-        color: C(0x8fe8ff), transparent: true, opacity: 0.08,
+        color: C(0x8fe8ff), transparent: true, opacity: 0.07,
         blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
       })
     );
-    beam.position.y = -10;
+    beam.position.y = 80;
     scene.add(beam);
   }
 
@@ -154,21 +168,21 @@ var AcademyView = (function () {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b1220);
-    scene.fog = new THREE.Fog(0x0b1220, 80, 280);
+    scene.background = new THREE.Color(0x060a16);
+    scene.fog = new THREE.Fog(0x060a16, 900, 2800);
 
-    camera = new THREE.PerspectiveCamera(42, 1, 0.4, 800);
-    camera.position.set(72, 38, -58);
+    camera = new THREE.PerspectiveCamera(45, 1, 0.8, 8000);
+    camera.position.set(380, 310, 460);
 
     controls = new THREE.OrbitControls(camera, canvas);
-    controls.target.set(0, 12, 0);
+    controls.target.set(0, 220, 0);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.minDistance = 28;
-    controls.maxDistance = 160;
-    controls.maxPolarAngle = 1.35;
+    controls.minDistance = 80;
+    controls.maxDistance = 1600;
+    controls.maxPolarAngle = 1.42;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.35;
+    controls.autoRotateSpeed = 0.28;
 
     lights();
     buildStage();
@@ -212,11 +226,13 @@ var AcademyView = (function () {
     setNight: function (v) {
       night = v ? 1 : 0;
       if (!scene) return;
-      scene.background.set(v ? 0x070b16 : 0x0b1220);
-      scene.fog.color.set(v ? 0x070b16 : 0x0b1220);
-      if (hemi) hemi.intensity = v ? 0.22 : 0.55;
-      if (key) key.intensity = v ? 0.25 : 1.15;
-      if (fill) fill.intensity = v ? 0.15 : 0.35;
+      scene.background.set(v ? 0x05070e : 0x87a0b8);
+      scene.fog.color.set(v ? 0x05070e : 0x87a0b8);
+      scene.fog.near = v ? 900 : 1400;
+      scene.fog.far = v ? 2800 : 4200;
+      if (hemi) hemi.intensity = v ? 0.7 : 1.0;
+      if (key) { key.intensity = v ? 1.05 : 1.3; key.color.set(v ? 0x8fa8d8 : 0xffe1b0); }
+      if (fill) fill.intensity = v ? 2.0 : 1.1;
     },
     flyTo: function (clickName) {
       if (!root || !controls) return;
@@ -227,8 +243,8 @@ var AcademyView = (function () {
       obj.getWorldPosition(p);
       controls.target.copy(p);
       var dir = camera.position.clone().sub(controls.target).normalize();
-      camera.position.copy(p.clone().add(dir.multiplyScalar(36)));
-      camera.position.y = Math.max(camera.position.y, p.y + 10);
+      camera.position.copy(p.clone().add(dir.multiplyScalar(90)));
+      camera.position.y = Math.max(camera.position.y, p.y + 24);
     },
     onPick: function (cb) { onPick = cb; },
     isReady: function () { return ready; }

@@ -337,7 +337,10 @@
     if (window.AcademyView) AcademyView.setNight(true);
     nightBtn.classList.add('active'); if (dayBtn) dayBtn.classList.remove('active');
   });
-  if (dayBtn) dayBtn.classList.add('active');
+  if (nightBtn) {
+    nightBtn.classList.add('active');
+    if (window.AcademyView) AcademyView.setNight(true);
+  }
 
 
   var histEl = document.getElementById('academy-history');

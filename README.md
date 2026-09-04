@@ -24,7 +24,7 @@
 ## 这一版改了什么
 
 - **设定推倒重写。** 不再是女神大战虚空之蛇 + 霍格沃茨四院。四院是四个答案（花掉 / 写成字 / 打进铁里 / 还回海里），分选问的是“这一年的光你要花在什么上”，暮影是还清了贷因此不再投下影子的人。
-- **学院用 Blender 重做。** `blender/build_academy.py` 生成船岛：账桅、四院、退字阁、浮池、余年盘、旧艏。导出 `models/academy.glb`，在世界地图和学院页里各加载一次。
+- **学院用 Blender 重做。** `blender/engine/` 生成船岛（账桅、四院回廊、退字阁、浮池、观星台、旧舟）。`models/academy.glb` 在世界地图和学院页里各加载一次。夜景成图在 `renders/`。
 - **学院页是可点的 3D 视口。** 点建筑看志，昼 / 暮切换。
 - 三块大陆、十四势力、四十二城的地图还在，文案全部按新设定重写。
 
@@ -45,10 +45,8 @@ python3 -m http.server 8080
 需要本机 Blender 4.x：
 
 ```bash
-blender --background --factory-startup --python blender/build_academy.py
+bash tools/build.sh
 ```
-
-产物：`models/academy.glb`、`blender/academy.blend`、`img/academy-hero.png`。
 
 ## 目录
 

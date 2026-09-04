@@ -1060,14 +1060,16 @@ var World = (function () {
     academy = holder;
 
     function decorate(model) {
-      model.scale.setScalar(0.52);
+      var s = 0.26;
+      model.scale.setScalar(s);
       model.rotation.y = Math.PI * 0.08;
+      model.position.y = -240 * s;
       model.traverse(function (o) {
         if (o.isMesh) {
           o.castShadow = true;
           o.receiveShadow = true;
         }
-        if (o.name === 'SortingCrystal') academyCrystal = o;
+        if (o.name && o.name.indexOf('tower') === 0) academyCrystal = o;
       });
       holder.add(model);
     }
