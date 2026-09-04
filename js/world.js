@@ -1061,7 +1061,7 @@ var World = (function () {
     academy = g;
 
     // 真正的模型：Blender 程序化建模 → Draco glTF（与「星槎学院」页共用同一文件）
-    // 世界地图比例较小，按 0.62 缩放（岛长约 56 m 地图单位），并把陪岛石轨道一并带上
+    // 扩建版实际岛长 500 m；世界地图上仍保持原先约 56 个单位的可读大小。
     if (!THREE.GLTFLoader) { buildAcademyFallback(g); return; }
     var loader = new THREE.GLTFLoader();
     if (THREE.DRACOLoader) {
@@ -1072,7 +1072,7 @@ var World = (function () {
     }
     loader.load('models/xingcha_academy.glb', function (gltf) {
       var root = gltf.scene;
-      var S = 0.62;
+      var S = 0.112;
       root.scale.set(S, S, S);
       root.traverse(function (o) {
         if (!o.isMesh) return;

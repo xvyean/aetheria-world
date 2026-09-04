@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 星槎学院 · 总平面
-坐标：x 东、y 北、z 上，单位米。岛 90 × 68。
-所有位置都已经做过相互避让校验（环道 0.80R、内栏杆 0.955R、广场 r13）。
+坐标：x 东、y 北、z 上，单位米。岛 500 × 360。
+中央 90 × 68 米保留为古老内学宫，外圈是后世扩建的学院城。
 """
 import math
 
 TAU = math.pi * 2
 
 PLAZA_R = 13.0
-ROAD_K = 0.80        # 环道半径 = ROAD_K * R(θ)
+ROAD_K = 0.76        # 外环大道半径 = ROAD_K * R(θ)
 RAIL_IN_K = 0.955
 RAIL_OUT_K = 0.992
 
@@ -31,8 +31,8 @@ SYCAMORE = dict(pos=(-7.5, 24.5), trunk_r=1.25, h=19.0, crown_r=8.2)
 FORGE_TOWER = dict(pos=(0.0, -21.0), w=8.0, h=9.0)
 OLD_STEPS = dict(pos=(7.0, -23.5), r=2.2)
 TIDE_TOWER = dict(pos=(-28.0, 0.0), L=10.0, W=5.2, h=14.0)
-PIER = dict(x0=-33.0, x1=-57.0, y=0.0, w=3.2)
-FERRY = dict(pos=(-59.5, 4.0, -1.4), size=6.0)
+PIER = dict(x0=-33.0, x1=-258.0, y=0.0, w=4.6)
+FERRY = dict(pos=(-264.0, 5.0, -2.0), size=8.0)
 POOL = dict(pos=(-32.5, -12.5), r=4.4, r_center=math.hypot(32.5, 12.5))
 CLOUD_NET = dict(pos=(-30.5, -5.5), yaw=math.radians(180))
 
@@ -67,6 +67,18 @@ DORMS_SW = [(-142, -1), (-130, -1), (-112, -1),
 DORM_SIZE = (5.4, 4.4)
 DORM_IN_OFF = 3.4
 DORM_OUT_OFF = 3.3
+
+# 学院城扩建区：作为新建模块与热点的共享坐标。
+CITY_WALL = dict(a=218.0, b=151.0, h=8.5)
+DISTRICTS = {
+    'scholar': dict(pos=(0.0, 92.0), name='星语学宫'),
+    'dawn': dict(pos=(112.0, 8.0), name='晨辉演武院'),
+    'forge': dict(pos=(18.0, -94.0), name='锤音工造院'),
+    'tide': dict(pos=(-116.0, -10.0), name='海心港区'),
+    'residence': dict(pos=(104.0, 88.0), name='七年舍街'),
+    'service': dict(pos=(-102.0, 86.0), name='百工与疗愈区'),
+    'garden': dict(pos=(-92.0, -88.0), name='星植苑'),
+}
 
 # 广场灯柱：八角顶点（避开四条回廊）
 PLAZA_LAMPS = [math.radians(a) for a in (22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5)]

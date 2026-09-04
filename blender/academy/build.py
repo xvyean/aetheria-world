@@ -23,6 +23,7 @@ import island as IS
 import buildings_core as BC
 import buildings_houses as BH
 import buildings_life as BL
+import districts as DT
 
 
 def parse_args():
@@ -50,7 +51,8 @@ def parse_args():
 
 def make_collections():
     names = ['island', 'stones', 'paths', 'plaza', 'tower', 'corridors', 'dawn', 'speak', 'forge', 'tide',
-             'library', 'hall', 'dorms', 'garden', 'misc', 'veg', 'people', 'fx']
+             'library', 'hall', 'dorms', 'garden', 'misc', 'veg', 'people', 'fx',
+             'city_wall', 'city_paths', 'districts', 'city_veg', 'city_fx']
     return {n: coll('C_' + n) for n in names}
 
 
@@ -82,6 +84,7 @@ def build_all(opt):
         ('tide_hall', lambda: BL.build_tide_hall(M, C)),
         ('dorms', lambda: BL.build_dorms(M, C)),
         ('ember', lambda: BL.build_ember_garden(M, C)),
+        ('academy_city', lambda: DT.build_all(M, C)),
         ('veg', lambda: BL.build_vegetation(M, C)),
         ('people', lambda: BL.build_people(M, C)),
     ]
@@ -358,14 +361,14 @@ def render_views(out_dir, quality):
     gz = IS.ground_h(0, 0)
     top = gz + 1.35 + LY.STAR_TOWER['h']
     views = [
-        ('hero_sw', (-176, -142, 34), (0, 0, gz + 3), 42),
-        ('hero_ne', (160, 130, 34), (0, 0, gz + 3), 42),
-        ('pier_west', (-110, 30, 14), (-28, 0, gz + 9), 36),
+        ('hero_sw', (-520, -420, 250), (0, 0, gz + 4), 42),
+        ('hero_ne', (500, 390, 230), (0, 0, gz + 4), 42),
+        ('pier_west', (-390, 95, 90), (-120, 0, gz + 12), 36),
         ('plaza_low', (-15.5, -13.5, gz + 1.8), (2.0, 3.0, gz + 24), 48),
-        ('forge_side', (26, -52, gz + 8), (0, -20, gz + 5), 36),
-        ('sycamore', (20, 55, gz + 12), (-5, 22, gz + 9), 36),
-        ('underside', (85, -125, -70), (0, 0, -14), 36),
-        ('top_down', (0.1, -0.1, 210), (0, 0, gz), 40),
+        ('forge_side', (190, -210, gz + 70), (18, -94, gz + 8), 36),
+        ('sycamore', (70, 130, gz + 34), (-5, 35, gz + 10), 36),
+        ('underside', (310, -420, -235), (0, 0, -50), 36),
+        ('top_down', (0.1, -0.1, 710), (0, 0, gz), 40),
     ]
     if quality == 'low':
         views = views[:4] + views[6:7]
@@ -437,6 +440,23 @@ def export_hotspots(path):
     add('paddock', '马圈（六匹很胖的马）', math.cos(pa) * LY.PADDOCK['r'], math.sin(pa) * LY.PADDOCK['r'], IS.ground_h(math.cos(pa) * LY.PADDOCK['r'], math.sin(pa) * LY.PADDOCK['r']) + 3.5, 3.0, None)
     add('root', '塔根 · 裂隙光柱', 0, 0, IS.TIP_Z - 6.0, 6.0, [40, -60, IS.TIP_Z - 30])
     add('corridors', '四院回廊', 20.0, 0.0, gz + 6.0, 3.0, None)
+    # 外城扩建区
+    add('city_wall', '星槎外城墙', 0, LY.CITY_WALL['b'],
+        IS.ground_h(0, LY.CITY_WALL['b']) + 13.0, 12.0,
+        [0, LY.CITY_WALL['b'] + 95, gz + 62])
+    for key, title, camoff in (
+        ('scholar_quarter', '星语学宫', (72, 70, 52)),
+        ('dawn_quarter', '晨辉演武院', (76, -62, 48)),
+        ('forge_quarter', '锤音工造院', (72, -72, 45)),
+        ('tide_quarter', '海心港区', (-82, -72, 44)),
+        ('residence_quarter', '七年舍街', (72, 66, 45)),
+        ('service_quarter', '百工与疗愈区', (-75, 68, 44)),
+        ('garden_quarter', '星植苑', (-72, -70, 40)),
+    ):
+        source_key = key.replace('_quarter', '')
+        dx, dy = LY.DISTRICTS[source_key]['pos']
+        add(key, title, dx, dy, IS.ground_h(dx, dy) + 17.0, 15.0,
+            [dx + camoff[0], dy + camoff[1], gz + camoff[2]])
     meta = dict(island=dict(a=IS.A_AXIS, b=IS.B_AXIS, ground=gz, tip=IS.TIP_Z), hotspots=H)
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=1)

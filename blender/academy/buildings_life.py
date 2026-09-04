@@ -471,6 +471,13 @@ def build_vegetation(M, C):
         (LY.BELL_TOWER['pos'][0], LY.BELL_TOWER['pos'][1], 3.0),
         (math.cos(LY.PADDOCK['theta']) * LY.PADDOCK['r'], math.sin(LY.PADDOCK['theta']) * LY.PADDOCK['r'], 5.0),
     ]
+    # 新学院城各功能区由 districts.py 统一布局，随机林木不得穿进建筑群。
+    district_clearance = {
+        'scholar': 50.0, 'dawn': 54.0, 'forge': 55.0, 'tide': 55.0,
+        'residence': 58.0, 'service': 55.0, 'garden': 50.0,
+    }
+    for key, spec in LY.DISTRICTS.items():
+        blockers.append((spec['pos'][0], spec['pos'][1], district_clearance[key]))
     for (adeg, side) in LY.DORMS_NE + LY.DORMS_SW:
         a = math.radians(adeg)
         rr = IS.road_r(a) + (LY.DORM_OUT_OFF + LY.DORM_SIZE[1] / 2 if side > 0 else -(LY.DORM_IN_OFF + LY.DORM_SIZE[1] / 2))
@@ -501,7 +508,7 @@ def build_vegetation(M, C):
         return True
     placed = []
     tries = 0
-    while len(placed) < 95 and tries < 6000:
+    while len(placed) < 210 and tries < 12000:
         tries += 1
         a = rng.uniform(0, TAU)
         R = IS.island_radius(a)
@@ -523,7 +530,7 @@ def build_vegetation(M, C):
     # 灌木：环道边、建筑脚下
     n_bush = 0
     tries = 0
-    while n_bush < 70 and tries < 4000:
+    while n_bush < 160 and tries < 8000:
         tries += 1
         a = rng.uniform(0, TAU)
         R = IS.island_radius(a)

@@ -39,15 +39,15 @@ var Academy3D = (function () {
 
   var PRESETS = {
     dawn: { zenith: 0x2b4aa6, horizon: 0xf1bd8e, low: 0x6f7d98, sunDir: [-0.42, 0.36, -0.83], sunColor: 0xffd2a0, sunI: 3.0,
-            hemiSky: 0xcfd6f0, hemiGround: 0x7a6e5c, hemiI: 0.7, fog: 0xdcc3b4, fogNear: 300, fogFar: 1300, stars: 0.12, night: 0.10, exposure: 1.12 },
+            hemiSky: 0xcfd6f0, hemiGround: 0x7a6e5c, hemiI: 0.7, fog: 0xdcc3b4, fogNear: 720, fogFar: 2600, stars: 0.12, night: 0.10, exposure: 1.12 },
     noon: { zenith: 0x1f6fd0, horizon: 0xd8ecf9, low: 0x8593a8, sunDir: [-0.30, 0.88, -0.36], sunColor: 0xfff5e3, sunI: 3.2,
-            hemiSky: 0xe4f1ff, hemiGround: 0x9a8f7b, hemiI: 0.72, fog: 0xdbe8f2, fogNear: 360, fogFar: 1500, stars: 0, night: 0, exposure: 1.1 },
+            hemiSky: 0xe4f1ff, hemiGround: 0x9a8f7b, hemiI: 0.72, fog: 0xdbe8f2, fogNear: 820, fogFar: 2800, stars: 0, night: 0, exposure: 1.1 },
     night: { zenith: 0x040613, horizon: 0x1a2350, low: 0x0a0e22, sunDir: [-0.55, 0.55, 0.62], sunColor: 0x8fa4ff, sunI: 0.6,
-             hemiSky: 0x2a3560, hemiGround: 0x101020, hemiI: 0.5, fog: 0x0c1230, fogNear: 260, fogFar: 1000, stars: 1, night: 1, exposure: 1.0 }
+             hemiSky: 0x2a3560, hemiGround: 0x101020, hemiI: 0.5, fog: 0x0c1230, fogNear: 620, fogFar: 2200, stars: 1, night: 1, exposure: 1.0 }
   };
 
-  var START_POS = new THREE.Vector3(-121, 38, 99);
-  var START_TGT = new THREE.Vector3(0, 9, 0);
+  var START_POS = new THREE.Vector3(-520, 285, 425);
+  var START_TGT = new THREE.Vector3(0, 12, 0);
 
   function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
@@ -193,7 +193,7 @@ var Academy3D = (function () {
         }
         classify(o);
         var nm = (o.name || '');
-        if (/^(island|tower|library|hall|dawn|speak|forge|tide)_/i.test(nm) && o.geometry && o.geometry.attributes.position && o.geometry.attributes.position.count > 400 && !o.userData.fx) {
+        if (/^(island|tower|library|hall|dawn|speak|forge|tide|citywall|scholar|residence|service|garden)_/i.test(nm) && o.geometry && o.geometry.attributes.position && o.geometry.attributes.position.count > 400 && !o.userData.fx) {
           occluders.push(o);
         }
       });
@@ -467,20 +467,20 @@ var Academy3D = (function () {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.copy(START_TGT);
     controls.enableDamping = true; controls.dampingFactor = 0.07;
-    controls.minDistance = 6; controls.maxDistance = 420;
+    controls.minDistance = 6; controls.maxDistance = 1400;
     controls.maxPolarAngle = Math.PI * 0.92; controls.minPolarAngle = 0.05;
     controls.autoRotateSpeed = 0.5;
 
     hemi = new THREE.HemisphereLight(0xbfc4e0, 0x6b6152, 0.55); scene.add(hemi);
     sun = new THREE.DirectionalLight(0xffd7a3, 2.6);
-    sun.position.set(160, 110, -220);
+    sun.position.set(520, 410, -680);
     sun.castShadow = true;
     sun.shadow.mapSize.set(4096, 4096);
-    sun.shadow.camera.left = -75; sun.shadow.camera.right = 75; sun.shadow.camera.top = 75; sun.shadow.camera.bottom = -75;
-    sun.shadow.camera.near = 50; sun.shadow.camera.far = 700;
+    sun.shadow.camera.left = -310; sun.shadow.camera.right = 310; sun.shadow.camera.top = 310; sun.shadow.camera.bottom = -310;
+    sun.shadow.camera.near = 80; sun.shadow.camera.far = 1800;
     sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03;
     scene.add(sun); scene.add(sun.target);
-    riftLight = new THREE.PointLight(0x6fd0ff, 1.2, 160, 1.6); riftLight.position.set(0, -48, 0); scene.add(riftLight);
+    riftLight = new THREE.PointLight(0x6fd0ff, 1.2, 360, 1.6); riftLight.position.set(0, -118, 0); scene.add(riftLight);
     crystalLight = new THREE.PointLight(0x9fe6ff, 1.5, 70, 1.8); crystalLight.position.set(0, 44.5, 0); scene.add(crystalLight);
 
     buildSky();
@@ -568,7 +568,7 @@ var Academy3D = (function () {
       return false;
     },
     flyHome: function () { flyTo(START_POS, START_TGT, 2.0); },
-    flyUnder: function () { flyTo(new THREE.Vector3(70, -95, 110), new THREE.Vector3(0, -30, 0), 2.4); },
+    flyUnder: function () { flyTo(new THREE.Vector3(260, -220, 330), new THREE.Vector3(0, -72, 0), 2.4); },
     setAutoRotate: function (b) { autoRotate = b; controls.autoRotate = b; },
     getAutoRotate: function () { return autoRotate; },
     projectHotspots: projectHotspots,

@@ -13,11 +13,11 @@ from mathutils import Vector
 from util import *
 import layout as LY
 
-A_AXIS, B_AXIS = 45.0, 34.0
-BITE_DEPTH, BITE_WIDTH = 11.0, 0.62      # 缺口深度（米）与半角宽（弧度）
-RIM_Z_DROP = 7.0                         # 崖壁垂直段
-TIP_Z = -40.0                            # 倒锥尖
-SEGS = 144                               # 角向分段
+A_AXIS, B_AXIS = 250.0, 180.0
+BITE_DEPTH, BITE_WIDTH = 38.0, 0.44      # 西门外的天然港湾
+RIM_Z_DROP = 13.0                        # 崖壁垂直段
+TIP_Z = -115.0                           # 扩展后的倒锥尖
+SEGS = 192                               # 大岛增加轮廓分段
 
 
 def island_radius(theta):
@@ -32,8 +32,8 @@ def island_radius(theta):
 
 
 def raw_h(x, y):
-    base = 0.3 + 3.0 * smoothstep(-42.0, 42.0, x)
-    base += 0.55 * fbm(x / 13.0, y / 13.0, 0.0, oct=3, seed=11.0)
+    base = 0.3 + 6.0 * smoothstep(-230.0, 230.0, x)
+    base += 0.85 * fbm(x / 34.0, y / 34.0, 0.0, oct=3, seed=11.0)
     d = math.hypot(x, y)
     plaza = 1.75
     k = smoothstep(LY.PLAZA_R + 6.0, LY.PLAZA_R + 2.0, d)
@@ -66,19 +66,9 @@ def ground_h(x, y):
 
 
 def road_r(th):
-    """环道中心半径：基础 0.80R，在海心塔与浮池处向内绕行。"""
+    """环道中心半径：外城与岛沿之间的一圈大道。"""
     R = island_radius(th)
-    r = R * LY.ROAD_K
-    d_tide = abs(math.atan2(math.sin(th - math.pi), math.cos(th - math.pi)))
-    if d_tide < 0.34:
-        k = smoothstep(0.34, 0.12, d_tide)
-        r = r * (1 - k) + 21.0 * k
-    th_pool = math.atan2(LY.POOL['pos'][1], LY.POOL['pos'][0])
-    d_pool = abs(math.atan2(math.sin(th - th_pool), math.cos(th - th_pool)))
-    if d_pool < 0.30:
-        k = smoothstep(0.30, 0.10, d_pool)
-        r = r * (1 - k) + (LY.POOL['r_center'] - LY.POOL['r'] - 2.2) * k
-    return r
+    return R * LY.ROAD_K
 
 
 def rail_gap(th):
@@ -99,7 +89,7 @@ def theta_r(x, y):
 def build_island(M, C):
     # ------------------------------------------------ 主体：极坐标网格 + 崖壁 + 倒锥
     rings = []
-    NR = 22
+    NR = 42
     # 岛面
     for i in range(NR + 1):
         t = i / NR
@@ -275,8 +265,8 @@ def build_island(M, C):
     rng = random.Random(1024)
     for i in range(34):
         a = TAU * i / 34 + rng.uniform(-0.12, 0.12)
-        orbit_r = rng.uniform(56.0, 84.0)
-        z = rng.uniform(-26.0, 14.0)
+        orbit_r = rng.uniform(285.0, 390.0)
+        z = rng.uniform(-72.0, 26.0)
         size = rng.choice([0.5, 0.8, 1.2, 1.8, 2.6, 3.6, 4.8]) * rng.uniform(0.8, 1.2)
         s = ico('Companion_Stone_%02d' % i, size, (math.cos(a) * orbit_r, math.sin(a) * orbit_r, z),
                 C['stones'], mat=M['rock'], subdiv=2 if size > 1.0 else 1, smooth=False)
@@ -305,8 +295,8 @@ def build_island(M, C):
     rng = random.Random(4242)
     for i in range(9):
         a = TAU * i / 9 + rng.uniform(-0.3, 0.3)
-        d = rng.uniform(70.0, 120.0)
-        z = rng.uniform(-70.0, -30.0) if i % 3 else rng.uniform(-20.0, 10.0)
+        d = rng.uniform(310.0, 520.0)
+        z = rng.uniform(-150.0, -70.0) if i % 3 else rng.uniform(-45.0, 16.0)
         cx, cy = math.cos(a) * d, math.sin(a) * d
         n_puff = rng.randint(3, 6)
         for j in range(n_puff):
@@ -354,7 +344,7 @@ def build_ring_road_paving(M, C):
     """东半环道铺石：一块块梯形石板贴着地面（西半只在顶点色里压出土路）。"""
     rng = random.Random(55)
     verts, faces = [], []
-    n = 150
+    n = 300
     for i in range(n):
         th0 = -math.pi / 2 + math.pi * i / n
         th1 = -math.pi / 2 + math.pi * (i + 0.86) / n
@@ -423,7 +413,7 @@ def build_railings(M, C):
                       (base + 2, base + 6, base + 7, base + 3), (base + 3, base + 7, base + 4, base + 0)])
 
     # 内圈
-    n_in = 132
+    n_in = 260
     pts = []
     for i in range(n_in):
         th = TAU * i / n_in
@@ -451,7 +441,7 @@ def build_railings(M, C):
     set_vcol_const(ob_rails, PAL['wood_mid'], jitter=0.1, seed=8)
     # 外圈：三步之外，矮桩铁链
     verts, faces = [], []
-    n_out = 160
+    n_out = 300
     pts = []
     for i in range(n_out):
         th = TAU * i / n_out

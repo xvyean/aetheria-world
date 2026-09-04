@@ -371,17 +371,19 @@
   var mkEl = document.getElementById('academy-making');
   if (mkEl) {
     mkEl.innerHTML =
-      '<p><b>建模</b> 整座空岛在 Blender 4.2 里用 Python 程序化生成（<code>blender/academy/build.py</code>）：倒锥岛体 18 环、星陨塔与外梯、四院四塔、七层星穗馆、二十二栋宿舍、梧桐、栈桥、渡船、云网、梯田——共约 5,000 个部件、17.6 万顶点。</p>' +
-      '<p><b>导出</b> 合并为 342 个网格，顶点色着色（无贴图），Draco 压缩 glTF 仅 1.7 MB；每个可动部件都带 <code>extras</code>（fx 类型、轨道参数、志书键），网页端据此点火、转晶、涨潮、开船。</p>' +
+      '<p><b>建模</b> 整座空岛用 Blender Python 程序化生成（<code>blender/academy/build.py</code>）：500 × 360 米岛体、中央旧学宫、外城墙、四门、四条大道与七个扩建校区——共约 8,900 个部件、35.7 万顶点。</p>' +
+      '<p><b>导出</b> 合并为 454 个网格，顶点色着色（无贴图），Draco 压缩 glTF 约 3.7 MB；可动部件保留 <code>extras</code>（fx 类型、轨道参数、志书键），网页端据此点火、转晶、涨潮、开船。</p>' +
       '<p><b>渲染</b> Cycles + AgX，附带云海与 Mist 大气合成，八个机位的成图在 <code>models/render_*.png</code>。</p>';
   }
 
   /* ---------------- 星槎学院：三维舞台 ---------------- */
 
-  var SPOT_ORDER = ['star_tower', 'crystal', 'pillars', 'corridors', 'dawn', 'speak', 'sycamore', 'forge', 'old_steps', 'tide', 'pier', 'ferry', 'pool',
+  var SPOT_ORDER = ['city_wall', 'scholar_quarter', 'dawn_quarter', 'forge_quarter', 'tide_quarter', 'residence_quarter', 'service_quarter', 'garden_quarter',
+    'star_tower', 'crystal', 'pillars', 'corridors', 'dawn', 'speak', 'sycamore', 'forge', 'old_steps', 'tide', 'pier', 'ferry', 'pool',
     'grain_hall', 'history_hall', 'tide_hall', 'kitchen', 'ember', 'bell', 'dorms', 'paddock', 'root'];
   // 远景只标大地标，近景才显示全部，避免地名挤成一团
-  var SPOT_MAJOR = { star_tower: 1, dawn: 1, speak: 1, forge: 1, tide: 1, grain_hall: 1, pier: 1, sycamore: 1, tide_hall: 1, root: 1 };
+  var SPOT_MAJOR = { city_wall: 1, scholar_quarter: 1, dawn_quarter: 1, forge_quarter: 1, tide_quarter: 1,
+    residence_quarter: 1, service_quarter: 1, garden_quarter: 1, star_tower: 1, pier: 1, root: 1 };
   var stage = document.getElementById('academy-stage');
   var spotCard = document.getElementById('spot-card');
   var spotList = document.getElementById('spot-list');
