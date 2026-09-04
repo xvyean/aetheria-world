@@ -5,3 +5,5 @@ node_modules/
 *.blend1
 *.blend2
 .arena/
+
+aetheria-world.tar.gz
