@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星槎学院 · 手册 | 艾瑟兰</title>
+<link rel="stylesheet" href="css/academy.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <span class="brand-mark">✧</span>
+      <div>
+        <h1>星槎学院 · 手册</h1>
+        <p class="sub">艾瑟兰 · 星辉历 412 年 · 烛守局存档第 412 卷</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="island" class="on">岛屿</button>
+      <button data-tab="houses">四院</button>
+      <button data-tab="mysteries">十谜</button>
+      <button data-tab="rules">岛规十三条</button>
+      <button data-tab="people">人物</button>
+      <button data-tab="world">世界</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ============ 岛屿（3D） ============ -->
+  <section id="tab-island" class="tab on">
+    <div class="stage-wrap">
+      <div id="stage"></div>
+      <div id="stage-fallback" class="fallback hidden">
+        <h2>学院空岛 · 平面总览</h2>
+        <p class="muted">（3D 查看器需要网络加载 three.js 与 academy.glb；当前显示平面版。）</p>
+        <div id="map-grid"></div>
+      </div>
+      <div class="holo-toolbar" id="holo-bar">
+        <button data-atmos="dusk" class="on">暮潮</button>
+        <button data-atmos="dawn">晨辉</button>
+        <button data-atmos="night">星夜</button>
+        <span class="spacer"></span>
+        <label class="chk"><input type="checkbox" id="chk-labels" checked> 点标注</label>
+      </div>
+      <div id="popup" class="popup hidden">
+        <button id="popup-close" class="popup-close">×</button>
+        <div id="popup-body"></div>
+      </div>
+    </div>
+    <div class="ledger" id="ledger">
+      <h3>岛上 · 此刻（412 年秋）</h3>
+      <ul id="ledger-list"></ul>
+    </div>
+  </section>
+
+  <!-- ============ 四院 ============ -->
+  <section id="tab-houses" class="tab">
+    <div class="houses" id="houses"></div>
+  </section>
+
+  <!-- ============ 十谜 ============ -->
+  <section id="tab-mysteries" class="tab">
+    <div class="mysteries" id="mysteries"></div>
+  </section>
+
+  <!-- ============ 岛规 ============ -->
+  <section id="tab-rules" class="tab">
+    <div class="rules">
+      <p class="rules-note">刻在山门。人人会背，但没人背得全。</p>
+      <ol id="rules-list"></ol>
+    </div>
+  </section>
+
+  <!-- ============ 人物 ============ -->
+  <section id="tab-people" class="tab">
+    <div class="people" id="people"></div>
+  </section>
+
+  <!-- ============ 世界 ============ -->
+  <section id="tab-world" class="tab">
+    <div class="world">
+      <div class="world-quote">
+        <p class="q">“光不是祝福。光是一笔还不上的账。”</p>
+        <p class="qa">——卫晚潮，星槎学院第十九任校长，熄灯钟下</p>
+      </div>
+      <h3>三大陆 · 六族 · 四十二城</h3>
+      <div class="world-intro">
+        <p>纪元前三千年的<b>大星陨</b>：星辰碎如雨坠。最大碎片落于主大陆北缘，把一块“光的伤口”留在了大地里——<b>星辉裂隙</b>。它至今没愈合，还在往外渗光。一切魔法都是<b>借光</b>：施法者以灵魂里的「心焰」为烛，引裂隙的光，用了要还——还的方式可以不同，这就是四院的分野。</p>
+      </div>
+      <div class="races" id="races"></div>
+      <h3>此刻的动静</h3>
+      <div class="news" id="news"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>艾瑟兰 · 星辉历 412 年秋 · 由 Blender 程序化建模 + Web 呈现 &nbsp;|&nbsp; 设定圣经见 <code>bible/</code> · 建模管账见 <code>blender/</code></p>
+</footer>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="js/data.js"></script>
+<script src="js/academy-view.js"></script>
+</body>
+</html>
