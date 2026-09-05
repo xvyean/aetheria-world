@@ -454,6 +454,7 @@ def build_vegetation(M, C):
     rng = random.Random(2000)
     blockers = [
         (0, 0, LY.PLAZA_R + 3.5),
+        (4, 56, 26.0),   # 旧学宫主堡
         (LY.DAWN_TOWER['pos'][0], LY.DAWN_TOWER['pos'][1], 6.5),
         (LY.SPEAK_TOWER['pos'][0], LY.SPEAK_TOWER['pos'][1], 6.0),
         (LY.SYCAMORE['pos'][0], LY.SYCAMORE['pos'][1], 7.0),

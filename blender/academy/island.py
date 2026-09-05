@@ -13,11 +13,16 @@ from mathutils import Vector
 from util import *
 import layout as LY
 
-A_AXIS, B_AXIS = 250.0, 180.0
+A_AXIS, B_AXIS = 330.0, 240.0
 BITE_DEPTH, BITE_WIDTH = 38.0, 0.44      # 西门外的天然港湾
 RIM_Z_DROP = 13.0                        # 崖壁垂直段
 TIP_Z = -115.0                           # 扩展后的倒锥尖
-SEGS = 192                               # 大岛增加轮廓分段
+SEGS = 224                               # 大岛增加轮廓分段
+
+#  wilds（外环荒野）：东脊山 / 西南湖
+MOUNTAIN = dict(cx=262.0, cy=26.0, sx=64.0, sy=150.0, h=58.0)   # 东脊
+LAKE = dict(cx=-238.0, cy=-118.0, sx=62.0, sy=52.0, depth=7.0) # 西南湖
+LAKE_Z = -2.6                                                  # 湖面高度
 
 
 def island_radius(theta):
@@ -35,6 +40,14 @@ def raw_h(x, y):
     base = 0.3 + 6.0 * smoothstep(-230.0, 230.0, x)
     base += 0.85 * fbm(x / 34.0, y / 34.0, 0.0, oct=3, seed=11.0)
     d = math.hypot(x, y)
+    wild = smoothstep(250.0, 272.0, d)          # 荒野特征只落在外环，不扰内城
+    # 东脊山：高斯山包 × 山脊噪声
+    gm = math.exp(-(((x - MOUNTAIN['cx']) / MOUNTAIN['sx']) ** 2 + ((y - MOUNTAIN['cy']) / MOUNTAIN['sy']) ** 2))
+    ridge = ridged(x / 26.0, y / 26.0, 0.4, oct=3, seed=31)
+    base += wild * gm * (MOUNTAIN['h'] * (0.55 + 0.45 * ridge))
+    # 西南湖盆
+    gl = math.exp(-(((x - LAKE['cx']) / LAKE['sx']) ** 2 + ((y - LAKE['cy']) / LAKE['sy']) ** 2))
+    base -= wild * gl * LAKE['depth']
     plaza = 1.75
     k = smoothstep(LY.PLAZA_R + 6.0, LY.PLAZA_R + 2.0, d)
     return base * (1 - k) + plaza * k
@@ -71,14 +84,25 @@ def road_r(th):
     return R * LY.ROAD_K
 
 
+def wild_sector(th):
+    """荒野扇区（东脊山 / 西南湖）：环道与栏杆在此让位给自然。"""
+    th_m = math.atan2(MOUNTAIN['cy'], MOUNTAIN['cx'])
+    if abs(math.atan2(math.sin(th - th_m), math.cos(th - th_m))) < 0.62:
+        return True
+    th_l = math.atan2(LAKE['cy'], LAKE['cx'])
+    if abs(math.atan2(math.sin(th - th_l), math.cos(th - th_l))) < 0.62:
+        return True
+    return False
+
+
 def rail_gap(th):
-    """栏杆断口：栈桥口与浮池。"""
+    """栏杆断口：栈桥口、浮池与荒野扇区。"""
     if abs(math.atan2(math.sin(th - math.pi), math.cos(th - math.pi))) < 0.15:
         return True
     th_pool = math.atan2(LY.POOL['pos'][1], LY.POOL['pos'][0])
     if abs(math.atan2(math.sin(th - th_pool), math.cos(th - th_pool))) < 0.17:
         return True
-    return False
+    return wild_sector(th)
 
 
 def theta_r(x, y):
@@ -198,7 +222,18 @@ def build_island(M, C):
         grass = mix(grass, soil, edge * 0.6)
         # 上下混合
         k = smoothstep(0.35, 0.8, up) * smoothstep(gz - 1.2, gz - 0.25, z)
-        return mix(rock, grass, k)
+        c = mix(rock, grass, k)
+        # 林底：外环密林压暗草色、叠落叶层
+        wf = smoothstep(235.0, 262.0, d)
+        litter = 0.5 + 0.5 * fbm(x / 2.0, y / 2.0, 3.0, oct=2, seed=27)
+        c = mix(c, tuple(cc * 0.7 for cc in mix(hex2lin(PAL['leaf_a'])[:3], hex2lin(PAL['soil'])[:3], litter)), wf * 0.55 * k)
+        # 湖岸浅滩沙色
+        shore = (1 - smoothstep(LAKE_Z + 0.4, LAKE_Z + 2.4, z)) * smoothstep(LAKE_Z - 1.6, LAKE_Z - 0.3, z)
+        c = mix(c, hex2lin('#c9b28a')[:3], shore * 0.8 * smoothstep(0.3, 0.6, up))
+        # 雪线
+        snow = smoothstep(34.0, 50.0, z + 3.0 * fbm(x / 7.0, y / 7.0, 1.0, oct=3, seed=29)) * smoothstep(0.25, 0.6, up)
+        c = mix(c, (0.92, 0.95, 1.0), snow)
+        return c
     set_vcol(ob, col_fn)
 
     # ------------------------------------------------ 塔根（星陨塔地基穿岛而出）
@@ -305,6 +340,21 @@ def build_island(M, C):
             c.scale = (1.0, rng.uniform(0.8, 1.3), rng.uniform(0.35, 0.5))
             c['fx'] = 'cloud'
             c['fx_i'] = i
+    # ------------------------------------------------ 西南湖：水面 + 岸石
+    lake = lathe('Lake_Water', [(60.0, -0.15), (0.0, -0.15)], 64, (LAKE['cx'], LAKE['cy'], LAKE_Z),
+                 C['fx'], M['water'], smooth=True)
+    lake.scale = (1.0, LAKE['sy'] / LAKE['sx'], 1.0)
+    lake['fx'] = 'water'
+    rng_l = random.Random(909)
+    for i in range(10):
+        a = TAU * i / 10 + rng_l.uniform(-0.3, 0.3)
+        rr = rng_l.uniform(58.0, 70.0)
+        s = ico('Lake_Rock_%02d' % i, rng_l.uniform(0.8, 2.2),
+                (LAKE['cx'] + math.cos(a) * rr, LAKE['cy'] + math.sin(a) * rr * (LAKE['sy'] / LAKE['sx']), LAKE_Z + 0.2),
+                C['island'], M['rock'], subdiv=1, smooth=False)
+        jitter_verts(s, 0.3, rng_l)
+        set_vcol_const(s, PAL['rock_b'], jitter=0.2, seed=300 + i)
+
     # ------------------------------------------------ 环道石板（东半）
     build_ring_road_paving(M, C)
     # ------------------------------------------------ 双圈栏杆
@@ -348,6 +398,8 @@ def build_ring_road_paving(M, C):
     for i in range(n):
         th0 = -math.pi / 2 + math.pi * i / n
         th1 = -math.pi / 2 + math.pi * (i + 0.86) / n
+        if wild_sector((th0 + th1) * 0.5):
+            continue
         for lane in range(2):
             o0 = -1.5 + lane * 1.5 + 0.06
             o1 = o0 + 1.5 - 0.12

@@ -24,6 +24,8 @@ import buildings_core as BC
 import buildings_houses as BH
 import buildings_life as BL
 import districts as DT
+import castle as CA
+import wilds as WD
 import atmosphere as AT
 
 
@@ -78,6 +80,7 @@ def build_all(opt):
         ('corridors', lambda: BC.build_corridors(M, C)),
         ('grain_hall', lambda: BC.build_grain_hall(M, C)),
         ('history_hall', lambda: BC.build_history_hall(M, C)),
+        ('castle', lambda: CA.build_castle(M, C)),
         ('dawn', lambda: BH.build_dawn_tower(M, C)),
         ('speak', lambda: BH.build_speak_tower(M, C)),
         ('forge', lambda: BH.build_forge_tower(M, C)),
@@ -86,6 +89,7 @@ def build_all(opt):
         ('dorms', lambda: BL.build_dorms(M, C)),
         ('ember', lambda: BL.build_ember_garden(M, C)),
         ('academy_city', lambda: DT.build_all(M, C)),
+        ('wilds', lambda: WD.build_all(M, C)),
         ('veg', lambda: BL.build_vegetation(M, C)),
         ('people', lambda: BL.build_people(M, C)),
     ]
@@ -185,14 +189,15 @@ def render_views(out_dir, quality):
     gz = IS.ground_h(0, 0)
     top = gz + 1.35 + LY.STAR_TOWER['h']
     views = [
-        ('hero_sw', (-520, -420, 250), (0, 0, gz + 4), 42),
-        ('hero_ne', (500, 390, 230), (0, 0, gz + 4), 42),
-        ('pier_west', (-390, 95, 90), (-120, 0, gz + 12), 36),
-        ('plaza_low', (-30, -27, gz + 2.6), (0.0, 0.0, gz + 27), 46),
+        ('hero_sw', (-660, -540, 320), (10, 10, gz + 6), 46),
+        ('hero_ne', (640, 520, 300), (0, 0, gz + 6), 46),
+        ('pier_west', (-500, 120, 110), (-140, 0, gz + 12), 36),
+        ('plaza_low', (-46, -40, gz + 5.0), (0.0, 0.0, gz + 30), 46),
+        ('castle', (150, -150, gz + 95), (4, 56, gz + 18), 40),
         ('forge_side', (190, -210, gz + 70), (18, -94, gz + 8), 36),
         ('sycamore', (70, 130, gz + 34), (-5, 35, gz + 10), 36),
-        ('underside', (300, -400, -80), (0, 0, -52), 40),
-        ('top_down', (0.1, -0.1, 710), (0, 0, gz), 40),
+        ('underside', (380, -520, -90), (0, 0, -55), 40),
+        ('top_down', (0.1, -0.1, 1300), (0, 0, gz), 44),
     ]
     if quality == 'low':
         views = views[:4] + views[6:7]
@@ -281,6 +286,12 @@ def export_hotspots(path):
         dx, dy = LY.DISTRICTS[source_key]['pos']
         add(key, title, dx, dy, IS.ground_h(dx, dy) + 17.0, 15.0,
             [dx + camoff[0], dy + camoff[1], gz + camoff[2]])
+    add('castle', '旧学宫主堡', 4, 56, gz + 30.0, 16.0, [80, -46, gz + 44])
+    add('lake', '西南湖', IS.LAKE['cx'], IS.LAKE['cy'], IS.LAKE_Z + 2.0, 22.0,
+        [IS.LAKE['cx'] + 70, IS.LAKE['cy'] - 70, gz + 34])
+    add('mountain', '东脊雪山', IS.MOUNTAIN['cx'], IS.MOUNTAIN['cy'], gz + 42.0, 26.0,
+        [IS.MOUNTAIN['cx'] - 90, IS.MOUNTAIN['cy'] - 130, gz + 80])
+    add('forest', '外环密林', 0, -272, gz + 8.0, 24.0, [0, -350, gz + 70])
     meta = dict(island=dict(a=IS.A_AXIS, b=IS.B_AXIS, ground=gz, tip=IS.TIP_Z), hotspots=H)
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=1)
@@ -297,10 +308,11 @@ def main():
     if opt['blend']:
         bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, 'xingcha_academy.blend'))
         log('blend saved', t0)
+    # 合并网格统一前置：导出与渲染共用，避免上万独立对象拖垮 Cycles 同步
+    merge_for_export(C)
+    v, f = stats()
+    print('TOTAL after merge: objects=%d verts=%d faces=%d' % (len(bpy.data.objects), v, f))
     if not opt.get('no_export'):
-        merge_for_export(C)
-        v, f = stats()
-        print('TOTAL after merge: objects=%d verts=%d faces=%d' % (len(bpy.data.objects), v, f))
         export_hotspots(os.path.join(out, 'xingcha_academy.hotspots.json'))
         glb = os.path.join(out, 'xingcha_academy.glb')
         export_glb(glb)
