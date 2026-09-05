@@ -10,7 +10,7 @@
 
 <img src="img/academy-hero.jpg" alt="星槎学院 · Blender 渲染" width="860">
 
-*星槎学院 —— 全部在 Blender 4.2 中由 Python 程序化建模，Cycles 渲染*
+*星槎学院 —— 全部在 Blender 4.3 中由 Python 程序化建模，Cycles 黄金时刻渲染*
 
 </div>
 
@@ -134,7 +134,7 @@ aetheria-world/
 ## 重新生成模型
 
 ```bash
-# 需要 Blender 4.2+（无界面运行）
+# 需要 Blender 4.3+（无界面运行）
 cd blender/academy
 blender -b --python build.py -- --out ../../models            # 建模 + 导出 GLB / 热点
 blender -b --python build.py -- --out ../../models --blend    # 另存 .blend

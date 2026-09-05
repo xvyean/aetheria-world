@@ -197,7 +197,7 @@ def mat_lib():
     M['plaster'] = principled('Plaster', '#e6dcc4', rough=0.9, vcol=True)
     M['roof_terra'] = principled('Roof_Terracotta', '#a8603f', rough=0.7, vcol=True)
     M['roof_blue'] = principled('Roof_BlueSlate', '#4f5f74', rough=0.65, vcol=True)
-    M['cloud'] = principled('FX_Cloud', '#f6f3ec', rough=1.0, alpha=0.55, emit='#fff6e8', emit_strength=0.35)
+    M['cloud'] = principled('FX_Cloud', '#f6f3ec', rough=1.0, alpha=0.5, emit='#fff6e8', emit_strength=0.12)
     M['moss'] = principled('FX_Moss', P['moss'], rough=0.8, emit='#5cf08a', emit_strength=2.5)
     M['beam'] = principled('FX_LightColumn', '#bfefff', rough=0.3, alpha=0.18, emit='#7fdcff', emit_strength=2.0)
     M['ash'] = principled('Ash', P['ash'], rough=1.0)
